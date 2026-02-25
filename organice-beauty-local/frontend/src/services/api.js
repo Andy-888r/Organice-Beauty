@@ -1,0 +1,103 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8080/api',
+});
+
+// Agregar token automáticamente a cada petición
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Redirigir al login si expira el token
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// =============================================
+// AUTH
+// =============================================
+export const authAPI = {
+  login: (data) => api.post('/auth/login', data),
+  registrarCliente: (data) => api.post('/auth/registro/cliente', data),
+  registrarProveedor: (data) => api.post('/auth/registro/proveedor', data),
+};
+
+// =============================================
+// PRODUCTOS
+// =============================================
+export const productosAPI = {
+  listarActivos: () => api.get('/productos/activos'),
+  listarTodos: () => api.get('/productos'),
+  buscarPorId: (id) => api.get(`/productos/${id}`),
+  crear: (formData) => api.post('/productos', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  actualizar: (id, formData) => api.put(`/productos/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  eliminar: (id) => api.delete(`/productos/${id}`),
+};
+
+// =============================================
+// SOLICITUDES DE ENTRADA
+// =============================================
+export const solicitudesAPI = {
+  crear: (data) => api.post('/proveedor/solicitudes', data),
+  listarPorProveedor: (id) => api.get(`/proveedor/${id}/solicitudes`),
+  listarPendientes: () => api.get('/admin/solicitudes/pendientes'),
+  contarPendientes: () => api.get('/admin/solicitudes/pendientes/count'),
+  aprobar: (id) => api.put(`/admin/solicitudes/${id}/aprobar`),
+  rechazar: (id) => api.put(`/admin/solicitudes/${id}/rechazar`),
+};
+
+// =============================================
+// INVENTARIO
+// =============================================
+export const inventarioAPI = {
+  listar: () => api.get('/admin/inventario'),
+  historial: () => api.get('/admin/inventario/historial'),
+  movimiento: (data) => api.post('/admin/inventario/movimiento', data),
+};
+
+// =============================================
+// CLIENTE
+// =============================================
+export const clienteAPI = {
+  perfil: (id) => api.get(`/cliente/${id}`),
+  actualizar: (id, data) => api.put(`/cliente/${id}`, data),
+  historial: (id) => api.get(`/cliente/${id}/historial`),
+  comprar: (data) => api.post('/cliente/compra', data, { responseType: 'blob' }),
+};
+
+// =============================================
+// ADMIN
+// =============================================
+export const adminAPI = {
+  clientes: () => api.get('/admin/clientes'),
+  eliminarCliente: (id) => api.delete(`/admin/clientes/${id}`),
+  proveedores: () => api.get('/admin/proveedores'),
+  actualizarProveedor: (id, data) => api.put(`/admin/proveedores/${id}`, data),
+  eliminarProveedor: (id) => api.delete(`/admin/proveedores/${id}`),
+  admins: () => api.get('/admin/admins'),
+  crearAdmin: (data) => api.post('/admin/admins', data),
+};
+
+// =============================================
+// PROVEEDOR
+// =============================================
+export const proveedorAPI = {
+  perfil: (id) => api.get(`/proveedor/${id}`),
+  actualizar: (id, data) => api.put(`/proveedor/${id}`, data),
+  productos: (id) => api.get(`/proveedor/${id}/productos`),
+};
+
+export default api;
