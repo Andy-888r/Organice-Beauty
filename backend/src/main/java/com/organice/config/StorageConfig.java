@@ -15,8 +15,10 @@ public class StorageConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath();
+        // uploadDir = "uploads/productos"
+        // Subimos un nivel para servir desde "uploads/"
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().getParent();
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath.getParent().toString() + "/");
+                .addResourceLocations("file:" + uploadPath.toString() + "/");
     }
 }

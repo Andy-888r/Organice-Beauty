@@ -69,7 +69,7 @@ export default function ClienteCompras() {
             <Grid item xs={12} sm={6} md={4} key={p.id}>
               <Card sx={{ height:'100%', display:'flex', flexDirection:'column' }}>
                 {p.imagenPath
-                  ? <CardMedia component="img" height="160" image={`http://localhost:8080${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
+                 ? <CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
                   : <Box sx={{ height:160, bgcolor:'#f8bbd9', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       <Typography fontSize={40}>💄</Typography></Box>
                 }

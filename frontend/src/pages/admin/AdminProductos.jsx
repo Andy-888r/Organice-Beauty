@@ -87,7 +87,7 @@ export default function AdminProductos() {
                   <TableCell>${p.precio?.toFixed(2)}</TableCell>
                   <TableCell><Chip label={p.activo ? 'Activo' : 'Inactivo'} color={p.activo ? 'success' : 'default'} size="small" /></TableCell>
                   <TableCell>
-                    {p.imagenPath && <img src={`http://localhost:8080${p.imagenPath}`} alt="img" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />}
+                    {p.imagenPath && <img src={`http://localhost:8080/api${p.imagenPath}`} alt="img" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />}
                   </TableCell>
                   <TableCell>
                     <Button size="small" startIcon={<Edit />} onClick={() => handleOpen(p)}>Editar</Button>
