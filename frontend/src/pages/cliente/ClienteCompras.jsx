@@ -113,3 +113,8 @@ export default function ClienteCompras() {
     </Box>
   );
 }
+
+
+/* prueba de imagen
+<CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
+*/
