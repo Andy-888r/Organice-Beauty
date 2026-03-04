@@ -10,6 +10,7 @@ import { Assessment, People, Store, Inventory, Notifications } from '@mui/icons-
 const MENU = [
   { label: 'Dashboard', icon: <Assessment />, path: '/admin' },
   { label: 'Productos', icon: <Inventory />, path: '/admin/productos' },
+  { label: 'Banners', icon: <Assessment />, path: '/admin/banners' },
   { label: 'Clientes', icon: <People />, path: '/admin/clientes' },
   { label: 'Proveedores', icon: <Store />, path: '/admin/proveedores' },
   { label: 'Inventario', icon: <Inventory />, path: '/admin/inventario' },

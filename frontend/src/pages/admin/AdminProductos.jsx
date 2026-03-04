@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody,
          Paper, Chip, Dialog, DialogTitle, DialogContent, DialogActions,
          TextField, FormControlLabel, Switch, AppBar, Toolbar, Select, MenuItem } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Add, Edit, Delete, CloudUpload } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Sidebar from '../../components/shared/Sidebar';
 import { productosAPI } from '../../services/api';
@@ -11,6 +11,7 @@ import { Assessment, People, Store, Inventory, Notifications } from '@mui/icons-
 const MENU = [
   { label: 'Dashboard', icon: <Assessment />, path: '/admin' },
   { label: 'Productos', icon: <Inventory />, path: '/admin/productos' },
+  { label: 'Banners', icon: <Assessment />, path: '/admin/banners' },
   { label: 'Clientes', icon: <People />, path: '/admin/clientes' },
   { label: 'Proveedores', icon: <Store />, path: '/admin/proveedores' },
   { label: 'Inventario', icon: <Inventory />, path: '/admin/inventario' },
@@ -106,11 +107,11 @@ export default function AdminProductos() {
             <TextField label="Marca" value={form.marca} onChange={e => setForm({...form, marca: e.target.value})} fullWidth />
             <TextField label="Categoría" value={form.categoria} onChange={e => setForm({...form, categoria: e.target.value})} fullWidth />
             <TextField label="Descripción" value={form.descripcion} onChange={e => setForm({...form, descripcion: e.target.value})} fullWidth multiline rows={2} />
-            <TextField label="Precio" type="number" value={form.precio} onChange={e => setForm({...form, precio: e.target.value})} fullWidth />
+            <TextField label="Precio" type="number" value={form.precio}onChange={e => {const val = e.target.value;if (val === '' || (Number.isInteger(Number(val)) && parseInt(val) >= 1)) {setForm({...form, precio: val}); }}}inputProps={{ min: 1, step: 1 }}fullWidth/>
             <FormControlLabel control={<Switch checked={form.activo} onChange={e => setForm({...form, activo: e.target.checked})} />} label="Activo" />
-            <Button variant="outlined" component="label">
-              Subir imagen (Amazon S3)
-              <input hidden accept="image/*" type="file" onChange={e => setImagen(e.target.files[0])} />
+            <Button variant="outlined" component="label" startIcon={<CloudUpload />}>
+            Subir imagen
+            <input hidden accept="image/*" type="file" onChange={e => setImagen(e.target.files[0])} />
             </Button>
             {imagen && <Typography variant="caption">✅ {imagen.name}</Typography>}
           </DialogContent>

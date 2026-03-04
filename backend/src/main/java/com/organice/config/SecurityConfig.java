@@ -38,6 +38,7 @@ public class SecurityConfig {
                 // Rutas públicas
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/productos/activos").permitAll()
+                .requestMatchers("/banners/activos").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 // Rutas por rol
                 .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -68,3 +69,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+
+
+
+
+
+
+

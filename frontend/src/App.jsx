@@ -18,6 +18,7 @@ import AdminProveedores from './pages/admin/AdminProveedores';
 import AdminInventario from './pages/admin/AdminInventario';
 import AdminSolicitudes from './pages/admin/AdminSolicitudes';
 import AdminReportes from './pages/admin/AdminReportes';
+import AdminBanners from './pages/admin/AdminBanners';
 
 // Panel Cliente
 import ClienteDashboard from './pages/cliente/ClienteDashboard';
@@ -58,6 +59,7 @@ function AppRoutes() {
       <Route path="/admin/inventario" element={<ProtectedRoute roles={['ADMIN']}><AdminInventario /></ProtectedRoute>} />
       <Route path="/admin/solicitudes" element={<ProtectedRoute roles={['ADMIN']}><AdminSolicitudes /></ProtectedRoute>} />
       <Route path="/admin/reportes" element={<ProtectedRoute roles={['ADMIN']}><AdminReportes /></ProtectedRoute>} />
+      <Route path="/admin/banners" element={<ProtectedRoute roles={['ADMIN']}><AdminBanners /></ProtectedRoute>} />
 
       {/* Rutas Cliente */}
       <Route path="/cliente" element={<ProtectedRoute roles={['CLIENTE']}><ClienteDashboard /></ProtectedRoute>} />
@@ -88,3 +90,9 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+
+
+
+
+

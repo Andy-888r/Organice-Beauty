@@ -85,7 +85,8 @@ export const adminAPI = {
   clientes: () => api.get('/admin/clientes'),
   eliminarCliente: (id) => api.delete(`/admin/clientes/${id}`),
   proveedores: () => api.get('/admin/proveedores'),
-  actualizarProveedor: (id, data) => api.put(`/admin/proveedores/${id}`, data),
+  crearProveedor: (fd) => api.post('/admin/proveedores', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  actualizarProveedor: (id, fd) => api.put(`/admin/proveedores/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
   eliminarProveedor: (id) => api.delete(`/admin/proveedores/${id}`),
   admins: () => api.get('/admin/admins'),
   crearAdmin: (data) => api.post('/admin/admins', data),
@@ -101,3 +102,14 @@ export const proveedorAPI = {
 };
 
 export default api;
+
+// =============================================
+// BANNERS PROMOCIONALES
+// =============================================
+export const bannersAPI = {
+  listarActivos: () => api.get('/banners/activos'),
+  listarTodos:   () => api.get('/banners'),
+  crear: (fd)    => api.post('/banners', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  actualizar: (id, fd) => api.put(`/banners/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  eliminar: (id) => api.delete(`/banners/${id}`),
+};
