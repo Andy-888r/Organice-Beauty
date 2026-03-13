@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Card, CardContent, CardMedia, CardActions,
-         Button, TextField, Badge, Drawer, List, ListItem, ListItemText,
-         Divider, AppBar, Toolbar, Chip } from '@mui/material';
-import { ShoppingCart, History, Person, Add, Remove } from '@mui/icons-material';
+         Button, Badge, Drawer, List, ListItem, ListItemText,
+         Divider, AppBar, Toolbar } from '@mui/material';
+import { ShoppingCart, History, Person, Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Sidebar from '../../components/shared/Sidebar';
 import { productosAPI, clienteAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const MENU = [
-  { label: 'Inicio', icon: <ShoppingCart />, path: '/cliente' },
-  { label: 'Comprar', icon: <ShoppingCart />, path: '/cliente/compras' },
-  { label: 'Historial', icon: <History />, path: '/cliente/historial' },
-  { label: 'Mi Perfil', icon: <Person />, path: '/cliente/perfil' },
+  { label: 'Inicio',    icon: <ShoppingCart />, path: '/cliente' },
+  { label: 'Comprar',   icon: <ShoppingCart />, path: '/cliente/compras' },
+  { label: 'Historial', icon: <History />,      path: '/cliente/historial' },
+  { label: 'Mi Perfil', icon: <Person />,       path: '/cliente/perfil' },
 ];
 
 export default function ClienteCompras() {
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito] = useState([]);
+  const [carrito, setCarrito]     = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user } = useAuth();
 
@@ -33,7 +33,6 @@ export default function ClienteCompras() {
   };
 
   const eliminarDelCarrito = (id) => setCarrito(prev => prev.filter(i => i.id !== id));
-
   const total = carrito.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
 
   const handleComprar = async () => {
@@ -43,21 +42,23 @@ export default function ClienteCompras() {
       const res = await clienteAPI.comprar(req);
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
       const link = document.createElement('a'); link.href = url; link.download = 'ticket.pdf'; link.click();
-      setCarrito([]);
-      setDrawerOpen(false);
+      setCarrito([]); setDrawerOpen(false);
       toast.success('¡Compra realizada! Se descargó tu ticket.');
     } catch (e) { toast.error('Error al procesar la compra'); }
   };
 
   return (
-    <Box sx={{ display:'flex' }}>
+    <Box sx={{ display:'flex', bgcolor:'#FAF7F4', minHeight:'100vh' }}>
       <Sidebar items={MENU} />
       <Box component="main" sx={{ flexGrow:1, p:3 }}>
-        <AppBar position="static" color="transparent" elevation={0} sx={{ mb:3 }}>
+        <AppBar position="static" elevation={0} sx={{ mb:3, bgcolor:'#FFFFFF', borderBottom:'1px solid rgba(160,82,45,0.15)' }}>
           <Toolbar>
-            <Typography variant="h5" fontWeight="bold" sx={{ flexGrow:1 }}>Productos Disponibles</Typography>
-            <Badge badgeContent={carrito.length} color="primary">
-              <Button variant="outlined" startIcon={<ShoppingCart />} onClick={() => setDrawerOpen(true)}>
+            <Typography variant="h5" fontWeight="bold" sx={{ flexGrow:1, color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>
+              Productos Disponibles
+            </Typography>
+            <Badge badgeContent={carrito.length} sx={{ '& .MuiBadge-badge':{ bgcolor:'#A0522D', color:'white' } }}>
+              <Button variant="outlined" startIcon={<ShoppingCart />} onClick={() => setDrawerOpen(true)}
+                sx={{ borderColor:'#A0522D', color:'#A0522D', '&:hover':{ borderColor:'#D4956A', bgcolor:'rgba(212,149,106,0.08)' } }}>
                 Carrito — ${total.toFixed(2)}
               </Button>
             </Badge>
@@ -67,19 +68,21 @@ export default function ClienteCompras() {
         <Grid container spacing={2}>
           {productos.map(p => (
             <Grid item xs={12} sm={6} md={4} key={p.id}>
-              <Card sx={{ height:'100%', display:'flex', flexDirection:'column' }}>
+              <Card sx={{ height:'100%', display:'flex', flexDirection:'column', borderRadius:2,
+                '&:hover':{ boxShadow:'0 6px 20px rgba(160,82,45,0.18)' } }}>
                 {p.imagenPath
-                 ? <CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
-                  : <Box sx={{ height:160, bgcolor:'#f8bbd9', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  ? <CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
+                  : <Box sx={{ height:160, bgcolor:'#F5E6D8', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       <Typography fontSize={40}>💄</Typography></Box>
                 }
                 <CardContent sx={{ flexGrow:1 }}>
-                  <Typography variant="h6">{p.nombre}</Typography>
+                  <Typography variant="h6" sx={{ color:'#3d2b26' }}>{p.nombre}</Typography>
                   <Typography variant="body2" color="text.secondary">{p.marca} | {p.categoria}</Typography>
-                  <Typography variant="h6" color="primary" mt={1}>${p.precio?.toFixed(2)}</Typography>
+                  <Typography variant="h6" mt={1} sx={{ color:'#A0522D' }} fontWeight="bold">${p.precio?.toFixed(2)}</Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" variant="contained" startIcon={<Add />} onClick={() => agregarAlCarrito(p)}>
+                  <Button size="small" variant="contained" startIcon={<Add />} onClick={() => agregarAlCarrito(p)}
+                    sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
                     Agregar
                   </Button>
                 </CardActions>
@@ -90,11 +93,11 @@ export default function ClienteCompras() {
 
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <Box sx={{ width:320, p:2 }}>
-            <Typography variant="h6" fontWeight="bold" mb={2}>🛒 Carrito</Typography>
+            <Typography variant="h6" fontWeight="bold" mb={2} sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>🛒 Carrito</Typography>
             <List>
               {carrito.map(item => (
                 <ListItem key={item.id} secondaryAction={
-                  <Button size="small" color="error" onClick={() => eliminarDelCarrito(item.id)}>✕</Button>}>
+                  <Button size="small" sx={{ color:'#A0522D' }} onClick={() => eliminarDelCarrito(item.id)}>✕</Button>}>
                   <ListItemText primary={item.nombre} secondary={`x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}`} />
                 </ListItem>
               ))}
@@ -102,8 +105,11 @@ export default function ClienteCompras() {
             {carrito.length > 0 && (
               <>
                 <Divider />
-                <Typography variant="h6" mt={2} mb={2}>Total: ${total.toFixed(2)}</Typography>
-                <Button fullWidth variant="contained" onClick={handleComprar}>Comprar y Descargar Ticket</Button>
+                <Typography variant="h6" mt={2} mb={2} sx={{ color:'#3d2b26' }}>Total: ${total.toFixed(2)}</Typography>
+                <Button fullWidth variant="contained" onClick={handleComprar}
+                  sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
+                  Comprar y Descargar Ticket
+                </Button>
               </>
             )}
             {carrito.length === 0 && <Typography color="text.secondary" textAlign="center" mt={4}>El carrito está vacío</Typography>}
@@ -115,6 +121,37 @@ export default function ClienteCompras() {
 }
 
 
-/* prueba de imagen
-<CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
