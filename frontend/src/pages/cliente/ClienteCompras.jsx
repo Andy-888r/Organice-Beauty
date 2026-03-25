@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import Sidebar from '../../components/shared/Sidebar';
 import { productosAPI, clienteAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 
 const MENU = [
   { label: 'Inicio',    icon: <ShoppingCart />, path: '/cliente' },
@@ -17,34 +18,38 @@ const MENU = [
 
 export default function ClienteCompras() {
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito]     = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user } = useAuth();
+  const { carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, total } = useCart();
 
-  useEffect(() => { productosAPI.listarActivos().then(r => setProductos(r.data)); }, []);
+  useEffect(() => { 
+    productosAPI.listarActivos().then(r => setProductos(r.data)); 
+  }, []);
 
-  const agregarAlCarrito = (p) => {
-    setCarrito(prev => {
-      const ex = prev.find(i => i.id === p.id);
-      if (ex) return prev.map(i => i.id === p.id ? {...i, cantidad: i.cantidad+1} : i);
-      return [...prev, {...p, cantidad: 1}];
-    });
+  const handleAgregar = (p) => {
+    agregarAlCarrito(p);
     toast.success(`${p.nombre} agregado al carrito`);
   };
-
-  const eliminarDelCarrito = (id) => setCarrito(prev => prev.filter(i => i.id !== id));
-  const total = carrito.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
 
   const handleComprar = async () => {
     if (carrito.length === 0) { toast.warning('El carrito está vacío'); return; }
     try {
-      const req = { idCliente: user.id, items: carrito.map(i => ({ idProducto: i.id, cantidad: i.cantidad, precio: i.precio })) };
+      const req = { 
+        idCliente: user.id, 
+        items: carrito.map(i => ({ idProducto: i.id, cantidad: i.cantidad, precio: i.precio })) 
+      };
       const res = await clienteAPI.comprar(req);
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a'); link.href = url; link.download = 'ticket.pdf'; link.click();
-      setCarrito([]); setDrawerOpen(false);
+      const link = document.createElement('a'); 
+      link.href = url; 
+      link.download = 'ticket.pdf'; 
+      link.click();
+      limpiarCarrito(); 
+      setDrawerOpen(false);
       toast.success('¡Compra realizada! Se descargó tu ticket.');
-    } catch (e) { toast.error('Error al procesar la compra'); }
+    } catch (e) { 
+      toast.error('Error al procesar la compra'); 
+    }
   };
 
   return (
@@ -81,7 +86,7 @@ export default function ClienteCompras() {
                   <Typography variant="h6" mt={1} sx={{ color:'#A0522D' }} fontWeight="bold">${p.precio?.toFixed(2)}</Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" variant="contained" startIcon={<Add />} onClick={() => agregarAlCarrito(p)}
+                  <Button size="small" variant="contained" startIcon={<Add />} onClick={() => handleAgregar(p)}
                     sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
                     Agregar
                   </Button>
@@ -93,65 +98,40 @@ export default function ClienteCompras() {
 
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <Box sx={{ width:320, p:2 }}>
-            <Typography variant="h6" fontWeight="bold" mb={2} sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>🛒 Carrito</Typography>
+            <Typography variant="h6" fontWeight="bold" mb={2} sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>
+              🛒 Carrito
+            </Typography>
             <List>
               {carrito.map(item => (
                 <ListItem key={item.id} secondaryAction={
                   <Button size="small" sx={{ color:'#A0522D' }} onClick={() => eliminarDelCarrito(item.id)}>✕</Button>}>
-                  <ListItemText primary={item.nombre} secondary={`x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}`} />
+                  <ListItemText 
+                    primary={item.nombre} 
+                    secondary={`x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}`} 
+                  />
                 </ListItem>
               ))}
             </List>
             {carrito.length > 0 && (
               <>
                 <Divider />
-                <Typography variant="h6" mt={2} mb={2} sx={{ color:'#3d2b26' }}>Total: ${total.toFixed(2)}</Typography>
+                <Typography variant="h6" mt={2} mb={2} sx={{ color:'#3d2b26' }}>
+                  Total: ${total.toFixed(2)}
+                </Typography>
                 <Button fullWidth variant="contained" onClick={handleComprar}
                   sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
                   Comprar y Descargar Ticket
                 </Button>
               </>
             )}
-            {carrito.length === 0 && <Typography color="text.secondary" textAlign="center" mt={4}>El carrito está vacío</Typography>}
+            {carrito.length === 0 && (
+              <Typography color="text.secondary" textAlign="center" mt={4}>
+                El carrito está vacío
+              </Typography>
+            )}
           </Box>
         </Drawer>
       </Box>
     </Box>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

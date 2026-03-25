@@ -16,10 +16,6 @@ public class OrdenCompra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_proveedor", nullable = false)
-    private Proveedor proveedor;
-
     private LocalDateTime fecha = LocalDateTime.now();
 
     @Column(nullable = false)

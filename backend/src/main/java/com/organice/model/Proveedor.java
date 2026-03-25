@@ -3,13 +3,11 @@ package com.organice.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "proveedores")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Proveedor {
 
     @Id
@@ -19,20 +17,11 @@ public class Proveedor {
     @Column(nullable = false)
     private String nombre;
 
-    private String rfc;
-    private String usuario;
-    private String contrasena;
     private String empresa;
     private String telefono;
     private String correo;
-    private String direccion;
-
-    @Column(columnDefinition = "TEXT")
     private String descripcion;
-
-    @Column(name = "logo_path", length = 500)
     private String logoPath;
 
-    @Column(nullable = false)
     private Boolean activo = true;
 }

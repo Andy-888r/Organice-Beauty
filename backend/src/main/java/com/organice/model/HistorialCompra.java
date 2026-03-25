@@ -23,10 +23,6 @@ public class HistorialCompra {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
-    @ManyToOne
-    @JoinColumn(name = "id_proveedor")
-    private Proveedor proveedor;
-
     @Column(nullable = false)
     private Integer cantidad;
 

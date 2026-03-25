@@ -23,7 +23,8 @@ export default function Login() {
     try {
       const res = await authAPI.login(form);
       login(res.data);
-      navigate(`/${res.data.rol.toLowerCase()}`);
+      const rol = res.data.rol?.toLowerCase();
+     navigate(rol === 'admin' ? '/admin' : '/cliente');
     } catch (err) {
       setError(err.response?.data || 'Error al iniciar sesión');
     } finally { setLoading(false); }

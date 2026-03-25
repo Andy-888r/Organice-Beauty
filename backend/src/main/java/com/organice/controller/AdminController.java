@@ -36,7 +36,6 @@ public class AdminController {
     @GetMapping("/proveedores")
     public List<Proveedor> proveedores() { return proveedorRepo.findAll(); }
 
-    // Crear proveedor con logo
     @PostMapping(value = "/proveedores", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> crearProveedor(
             @RequestPart("proveedor") String json,
@@ -52,7 +51,6 @@ public class AdminController {
         }
     }
 
-    // Editar proveedor con logo
     @PutMapping(value = "/proveedores/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> actualizarProveedor(
             @PathVariable Integer id,

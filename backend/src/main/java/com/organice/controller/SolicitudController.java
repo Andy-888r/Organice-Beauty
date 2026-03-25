@@ -12,17 +12,15 @@ import java.util.Map;
 public class SolicitudController {
     @Autowired private SolicitudEntradaService service;
 
-    @PostMapping("/proveedor/solicitudes")
+    @PostMapping("/admin/solicitudes")
     public ResponseEntity<?> crear(@RequestBody Map<String, Object> body) {
         try {
             return ResponseEntity.ok(service.crearSolicitud(
-                (Integer) body.get("idProveedor"), (Integer) body.get("idProducto"),
-                (Integer) body.get("cantidad"), (String) body.get("motivo")));
+                (Integer) body.get("idProducto"),
+                (Integer) body.get("cantidad"),
+                (String) body.get("motivo")));
         } catch (Exception e) { return ResponseEntity.badRequest().body(e.getMessage()); }
     }
-
-    @GetMapping("/proveedor/{id}/solicitudes")
-    public List<SolicitudEntradaDTO> porProveedor(@PathVariable Integer id) { return service.listarPorProveedor(id); }
 
     @GetMapping("/admin/solicitudes/pendientes")
     public List<SolicitudEntradaDTO> pendientes() { return service.listarPendientes(); }
@@ -37,5 +35,7 @@ public class SolicitudController {
     }
 
     @PutMapping("/admin/solicitudes/{id}/rechazar")
-    public ResponseEntity<?> rechazar(@PathVariable Integer id) { return ResponseEntity.ok(service.rechazarSolicitud(id)); }
+    public ResponseEntity<?> rechazar(@PathVariable Integer id) { 
+        return ResponseEntity.ok(service.rechazarSolicitud(id)); 
+    }
 }

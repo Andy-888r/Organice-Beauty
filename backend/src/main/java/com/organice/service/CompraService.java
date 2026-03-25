@@ -92,22 +92,19 @@ public class CompraService {
             java.awt.Color NEGRO_CALIDO = new java.awt.Color(26,  18,  16);   // #1a1210 — fondo header
 
             // ── Fuentes ──
-            Font fLogoNombre  = new Font(Font.HELVETICA, 18, Font.BOLD,   java.awt.Color.WHITE);
-            Font fLogoSub     = new Font(Font.HELVETICA,  7, Font.NORMAL, CARAMELO);
-            Font fTituloDoc   = new Font(Font.HELVETICA, 20, Font.BOLD,   CAFE_TEXTO);
-            Font fNumero      = new Font(Font.HELVETICA,  9, Font.NORMAL, CARAMELO);
-            Font fLabel       = new Font(Font.HELVETICA,  8, Font.BOLD,   SIENNA);
-            Font fTexto       = new Font(Font.HELVETICA,  9, Font.NORMAL, CAFE_TEXTO);
-            Font fEncabezado  = new Font(Font.HELVETICA,  9, Font.BOLD,   java.awt.Color.WHITE);
-            Font fCelda       = new Font(Font.HELVETICA,  9, Font.NORMAL, CAFE_TEXTO);
-            Font fTotalLabel  = new Font(Font.HELVETICA, 10, Font.BOLD,   CAFE_TEXTO);
-            Font fTotalValor  = new Font(Font.HELVETICA, 10, Font.BOLD,   SIENNA);
-            Font fTotalFinal  = new Font(Font.HELVETICA, 11, Font.BOLD,   java.awt.Color.WHITE);
-            Font fPie         = new Font(Font.HELVETICA,  8, Font.NORMAL, new java.awt.Color(130, 100, 85));
+            // ── Fuentes ──
+           Font fLogoNombre  = new Font(Font.HELVETICA, 18, Font.BOLD,   java.awt.Color.WHITE);
+           Font fLogoSub     = new Font(Font.HELVETICA,  7, Font.NORMAL, CARAMELO);
+           Font fTituloDoc   = new Font(Font.HELVETICA, 20, Font.BOLD,   CAFE_TEXTO);
+           Font fNumero      = new Font(Font.HELVETICA,  9, Font.NORMAL, CARAMELO);
+           Font fEncabezado  = new Font(Font.HELVETICA,  9, Font.BOLD,   java.awt.Color.WHITE);
+           Font fCelda       = new Font(Font.HELVETICA,  9, Font.NORMAL, CAFE_TEXTO);
+           Font fTotalLabel  = new Font(Font.HELVETICA, 10, Font.BOLD,   CAFE_TEXTO);
+           Font fTotalFinal  = new Font(Font.HELVETICA, 11, Font.BOLD,   java.awt.Color.WHITE);
 
             String fecha = LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy",
-                    new java.util.Locale("es", "MX")));
+                     new java.util.Locale.Builder().setLanguage("es").setRegion("MX").build()));
             String hora  = LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
             String folio = "EB-" + System.currentTimeMillis() % 100000;
@@ -355,7 +352,6 @@ public class CompraService {
             pie.setSpacingBefore(12f);
 
             Font fContactoLabel = new Font(Font.HELVETICA, 8, Font.BOLD,   SIENNA);
-Font fContactoVal   = new Font(Font.HELVETICA, 8, Font.NORMAL, new java.awt.Color(120, 85, 65));
 Font fContactoRed   = new Font(Font.HELVETICA, 8, Font.BOLD,   new java.awt.Color(120, 85, 65));
 
 PdfPCell cContacto = new PdfPCell();
@@ -489,18 +485,6 @@ pie.addCell(cGracias);
         return linea;
     }
 
-    private void agregarLineaDelgada(PdfPCell celda, java.awt.Color color) {
-        PdfPTable linea = new PdfPTable(1);
-        try { linea.setWidths(new float[]{1}); } catch (Exception ignored) {}
-        PdfPCell lc = new PdfPCell(new Phrase(" "));
-        lc.setFixedHeight(1.5f);
-        lc.setBackgroundColor(color);
-        lc.setBorder(Rectangle.NO_BORDER);
-        linea.addCell(lc);
-        celda.addElement(linea);
-        celda.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 3)));
-    }
-
     private void agregarFilaTotales(PdfPTable tabla, String label, String valor,
                                      Font fLabel, Font fValor,
                                      java.awt.Color bg, java.awt.Color border) {
@@ -525,15 +509,6 @@ pie.addCell(cGracias);
         cV.setBackgroundColor(bg); cV.setPadding(8f);
         cV.setBorderColor(border); cV.setHorizontalAlignment(Element.ALIGN_RIGHT);
         tabla.addCell(cV);
-    }
-
-    private void agregarCelda(PdfPTable table, String texto, boolean encabezado) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto,
-                new Font(Font.HELVETICA, encabezado ? 12 : 10,
-                        encabezado ? Font.BOLD : Font.NORMAL)));
-        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celda.setBorderWidth(encabezado ? 1.5f : 1f);
-        table.addCell(celda);
     }
 }
 

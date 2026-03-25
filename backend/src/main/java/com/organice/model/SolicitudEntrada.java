@@ -16,10 +16,6 @@ public class SolicitudEntrada {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_proveedor", nullable = false)
-    private Proveedor proveedor;
-
-    @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 

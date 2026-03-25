@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.util.List;
 
 @Entity
 @Table(name = "clientes")
@@ -29,6 +30,12 @@ public class Cliente {
     private String correo;
     private String direccion;
 
-    @Column(columnDefinition = "TEXT")
-    private String preferencias;
+    // 🔥 NUEVO SISTEMA DE PREFERENCIAS
+    @ElementCollection
+    @CollectionTable(
+        name = "cliente_preferencias",
+        joinColumns = @JoinColumn(name = "cliente_id")
+    )
+    @Column(name = "preferencia")
+    private List<String> preferencias;
 }

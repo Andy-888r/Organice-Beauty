@@ -2,13 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { CartProvider } from './context/CartContext';
+
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Páginas comunes
 import Login from './pages/Login';
 import RegistroCliente from './pages/RegistroCliente';
-import RegistroProveedor from './pages/RegistroProveedor';
 
 // Panel Admin
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -26,13 +27,6 @@ import ClienteCompras from './pages/cliente/ClienteCompras';
 import ClienteHistorial from './pages/cliente/ClienteHistorial';
 import ClientePerfil from './pages/cliente/ClientePerfil';
 
-// Panel Proveedor
-import ProveedorDashboard from './pages/proveedor/ProveedorDashboard';
-import ProveedorSolicitudes from './pages/proveedor/ProveedorSolicitudes';
-import ProveedorProductos from './pages/proveedor/ProveedorProductos';
-import ProveedorPerfil from './pages/proveedor/ProveedorPerfil';
-
-// Componente para rutas protegidas
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return <div>Cargando...</div>;
@@ -49,7 +43,6 @@ function AppRoutes() {
       {/* Rutas públicas */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${user.rol.toLowerCase()}`} />} />
       <Route path="/registro/cliente" element={<RegistroCliente />} />
-      <Route path="/registro/proveedor" element={<RegistroProveedor />} />
 
       {/* Rutas Admin */}
       <Route path="/admin" element={<ProtectedRoute roles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
@@ -67,13 +60,6 @@ function AppRoutes() {
       <Route path="/cliente/historial" element={<ProtectedRoute roles={['CLIENTE']}><ClienteHistorial /></ProtectedRoute>} />
       <Route path="/cliente/perfil" element={<ProtectedRoute roles={['CLIENTE']}><ClientePerfil /></ProtectedRoute>} />
 
-      {/* Rutas Proveedor */}
-      <Route path="/proveedor" element={<ProtectedRoute roles={['PROVEEDOR']}><ProveedorDashboard /></ProtectedRoute>} />
-      <Route path="/proveedor/solicitudes" element={<ProtectedRoute roles={['PROVEEDOR']}><ProveedorSolicitudes /></ProtectedRoute>} />
-      <Route path="/proveedor/productos" element={<ProtectedRoute roles={['PROVEEDOR']}><ProveedorProductos /></ProtectedRoute>} />
-      <Route path="/proveedor/perfil" element={<ProtectedRoute roles={['PROVEEDOR']}><ProveedorPerfil /></ProtectedRoute>} />
-
-      {/* Redirect por defecto */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
@@ -83,16 +69,12 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
+      <CartProvider>
       <Router>
         <AppRoutes />
         <ToastContainer position="top-right" autoClose={3000} />
       </Router>
+      </CartProvider>
     </AuthProvider>
   );
 }
-
-
-
-
-
-
