@@ -24,6 +24,11 @@ export const CartProvider = ({ children }) => {
     setCarrito(prev => prev.filter(i => i.id !== id));
   };
 
+const actualizarCantidad = (id, cantidad) => {
+    if (cantidad < 1) return;
+    setCarrito(prev => prev.map(i => i.id === id ? {...i, cantidad} : i));
+};
+
   const limpiarCarrito = () => {
     setCarrito([]);
     localStorage.removeItem('carrito');
@@ -32,7 +37,7 @@ export const CartProvider = ({ children }) => {
   const total = carrito.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
 
   return (
-    <CartContext.Provider value={{ carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, total }}>
+    <CartContext.Provider value={{ carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, actualizarCantidad, total }}>
       {children}
     </CartContext.Provider>
   );

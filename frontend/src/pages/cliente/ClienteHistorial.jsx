@@ -1,90 +1,76 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Paper, AppBar, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 import { ShoppingCart, History, Person } from '@mui/icons-material';
 import Sidebar from '../../components/shared/Sidebar';
 import { clienteAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { MARBLE_STYLES } from '../../styles/marble';
 
 const MENU = [
-  { label: 'Inicio',    icon: <ShoppingCart />, path: '/cliente' },
-  { label: 'Comprar',   icon: <ShoppingCart />, path: '/cliente/compras' },
-  { label: 'Historial', icon: <History />,      path: '/cliente/historial' },
-  { label: 'Mi Perfil', icon: <Person />,       path: '/cliente/perfil' },
+  { label:'Inicio',    icon:<ShoppingCart />, path:'/cliente' },
+  { label:'Comprar',   icon:<ShoppingCart />, path:'/cliente/compras' },
+  { label:'Historial', icon:<History />,      path:'/cliente/historial' },
+  { label:'Mi Perfil', icon:<Person />,       path:'/cliente/perfil' },
 ];
 
+const extraStyles = `
+  .eb-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:600; color:#9A6735; }
+  .eb-date  { font-family:'Jost',sans-serif; font-size:0.8rem; color:#55883B; }
+  .eb-qty   { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:600; color:#2C4A1E; }
+`;
+
 export default function ClienteHistorial() {
-  const [historial, setHistorial] = useState([]);
   const { user } = useAuth();
+  const [historial, setHistorial] = useState([]);
+
   useEffect(() => { clienteAPI.historial(user.id).then(r => setHistorial(r.data)); }, [user.id]);
 
   return (
-    <Box sx={{ display:'flex', bgcolor:'#FAF7F4', minHeight:'100vh' }}>
+    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+      <style>{MARBLE_STYLES}</style>
+      <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-      <Box component="main" sx={{ flexGrow:1, p:3 }}>
-        <AppBar position="static" elevation={0} sx={{ mb:2, bgcolor:'#FFFFFF', borderBottom:'1px solid rgba(160,82,45,0.15)' }}>
-          <Toolbar><Typography variant="h5" fontWeight="bold" sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>Mi Historial de Compras</Typography></Toolbar>
-        </AppBar>
-        <Paper sx={{ borderRadius:2, overflow:'hidden' }}>
-          <Table>
-            <TableHead sx={{ bgcolor:'#F5E6D8' }}>
-              <TableRow>
-                {['Fecha','Producto','Cantidad','Total'].map(h => (
-                  <TableCell key={h} sx={{ fontWeight:'bold', color:'#3d2b26' }}>{h}</TableCell>
+      <Box component="main" sx={{ flexGrow:1 }}>
+
+        <div className="eb-header">
+          <div>
+            <p className="eb-subtitle">Elite Beauty — Cuenta</p>
+            <h1 className="eb-title">Historial de Compras</h1>
+          </div>
+        </div>
+
+        <div className="eb-content">
+          <p className="eb-section-label">
+            {historial.length > 0 ? `${historial.length} compra(s) registrada(s)` : 'Sin compras aun'}
+          </p>
+          <div className="eb-table-wrap">
+            <table className="eb-table">
+              <thead>
+                <tr><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                {historial.length === 0 && (
+                  <tr><td colSpan={4}>
+                    <div className="eb-empty">
+                      <div className="eb-empty-icon">◈</div>
+                      <div className="eb-empty-title">Sin compras aun</div>
+                      <div className="eb-empty-sub"><span className="eb-ornament" />Explora nuestros productos<span className="eb-ornament" /></div>
+                    </div>
+                  </td></tr>
+                )}
+                {historial.map((h, idx) => (
+                  <tr key={idx}>
+                    <td><span className="eb-date">{new Date(h.fecha).toLocaleString('es-MX')}</span></td>
+                    <td style={{ fontWeight:500 }}>{h.producto?.nombre}</td>
+                    <td><span className="eb-qty">{h.cantidad}</span></td>
+                    <td><span className="eb-price">${h.total?.toFixed(2)}</span></td>
+                  </tr>
                 ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {historial.map((h, idx) => (
-                <TableRow key={idx} hover sx={{ '&:hover':{ bgcolor:'rgba(245,230,216,0.30)' } }}>
-                  <TableCell>{new Date(h.fecha).toLocaleString()}</TableCell>
-                  <TableCell>{h.producto?.nombre}</TableCell>
-                  <TableCell>{h.cantidad}</TableCell>
-                  <TableCell sx={{ color:'#A0522D', fontWeight:'bold' }}>${h.total?.toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
-              {historial.length === 0 && (
-                <TableRow><TableCell colSpan={4} align="center" sx={{ color:'text.secondary', py:4 }}>No tienes compras registradas</TableCell></TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Paper>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </Box>
     </Box>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

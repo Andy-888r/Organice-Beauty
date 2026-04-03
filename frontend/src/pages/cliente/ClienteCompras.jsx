@@ -1,136 +1,169 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardMedia, CardActions,
-         Button, Badge, Drawer, List, ListItem, ListItemText,
-         Divider, AppBar, Toolbar } from '@mui/material';
-import { ShoppingCart, History, Person, Add } from '@mui/icons-material';
+import { Box, Drawer } from '@mui/material';
+import { ShoppingCart, History, Person, Add, Remove, Delete } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Sidebar from '../../components/shared/Sidebar';
 import { productosAPI, clienteAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { MARBLE_STYLES } from '../../styles/marble';
 
 const MENU = [
-  { label: 'Inicio',    icon: <ShoppingCart />, path: '/cliente' },
-  { label: 'Comprar',   icon: <ShoppingCart />, path: '/cliente/compras' },
-  { label: 'Historial', icon: <History />,      path: '/cliente/historial' },
-  { label: 'Mi Perfil', icon: <Person />,       path: '/cliente/perfil' },
+  { label:'Inicio',    icon:<ShoppingCart />, path:'/cliente' },
+  { label:'Comprar',   icon:<ShoppingCart />, path:'/cliente/compras' },
+  { label:'Historial', icon:<History />,      path:'/cliente/historial' },
+  { label:'Mi Perfil', icon:<Person />,       path:'/cliente/perfil' },
 ];
+const BASE = 'http://localhost:8080/api';
+
+const extraStyles = `
+  .eb-cart-btn { display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#2C4A1E,#55883B); color:#F4F9F0; border:none; border-radius:2px; padding:12px 20px; cursor:pointer; font-family:'Jost',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; transition:all 0.2s; position:relative; box-shadow:0 2px 12px rgba(85,136,59,0.25); }
+  .eb-cart-btn:hover { box-shadow:0 4px 20px rgba(85,136,59,0.40); transform:translateY(-1px); }
+  .eb-cart-badge { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:#8B2E2E; color:#fff; font-family:'Jost',sans-serif; font-size:0.65rem; font-weight:500; display:flex; align-items:center; justify-content:center; }
+  .eb-products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
+  .eb-product-card { border-radius:2px; overflow:hidden; display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; }
+  .eb-product-card:hover { transform:translateY(-4px); box-shadow:0 10px 32px rgba(44,74,30,0.14); }
+  .eb-product-img { width:100%; height:190px; object-fit:cover; display:block; }
+  .eb-product-placeholder { width:100%; height:190px; background:rgba(85,136,59,0.10); display:flex; align-items:center; justify-content:center; font-size:2.5rem; color:#55883B; }
+  .eb-product-body { padding:18px 20px; flex:1; display:flex; flex-direction:column; background:rgba(248,252,244,0.90); }
+  .eb-product-name { font-family:'Jost',sans-serif; font-size:0.92rem; font-weight:500; color:#2C4A1E; margin-bottom:4px; }
+  .eb-product-meta { font-family:'Jost',sans-serif; font-size:0.72rem; color:#55883B; letter-spacing:0.06em; margin-bottom:12px; flex:1; }
+  .eb-product-footer { display:flex; align-items:center; justify-content:space-between; margin-top:auto; }
+  .eb-product-price { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; color:#9A6735; }
+  .eb-add-btn { background:linear-gradient(135deg,#2C4A1E,#55883B); color:#F4F9F0; border:none; border-radius:2px; padding:8px 16px; cursor:pointer; font-family:'Jost',sans-serif; font-size:0.62rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; display:flex; align-items:center; gap:6px; transition:all 0.2s; }
+  .eb-add-btn:hover { box-shadow:0 3px 12px rgba(85,136,59,0.30); }
+  .eb-drawer-header { padding:32px 28px 20px; border-bottom:1px solid rgba(85,136,59,0.15); background:rgba(240,247,234,0.95); }
+  .eb-drawer-subtitle { font-family:'Jost',sans-serif; font-size:0.62rem; font-weight:300; letter-spacing:0.22em; text-transform:uppercase; color:#55883B; margin:0 0 4px; }
+  .eb-drawer-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; color:#2C4A1E; margin:0; }
+  .eb-cart-item { padding:16px 28px; border-bottom:1px solid rgba(85,136,59,0.08); background:rgba(248,252,244,0.80); }
+  .eb-cart-item-name { font-family:'Jost',sans-serif; font-size:0.88rem; font-weight:500; color:#2C4A1E; margin-bottom:10px; }
+  .eb-cart-item-row { display:flex; align-items:center; justify-content:space-between; }
+  .eb-qty-control { display:flex; align-items:center; gap:0; border:1px solid rgba(85,136,59,0.30); border-radius:2px; overflow:hidden; }
+  .eb-qty-btn { width:30px; height:30px; background:transparent; border:none; cursor:pointer; color:#55883B; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+  .eb-qty-btn:hover { background:rgba(85,136,59,0.10); }
+  .eb-qty-num { width:32px; text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:600; color:#2C4A1E; border-left:1px solid rgba(85,136,59,0.15); border-right:1px solid rgba(85,136,59,0.15); line-height:30px; }
+  .eb-cart-item-subtotal { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:600; color:#9A6735; }
+  .eb-delete-btn { width:30px; height:30px; background:transparent; border:none; cursor:pointer; color:rgba(139,46,46,0.60); display:flex; align-items:center; justify-content:center; border-radius:2px; transition:all 0.15s; }
+  .eb-delete-btn:hover { color:#8B2E2E; background:rgba(139,46,46,0.07); }
+  .eb-drawer-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:rgba(240,247,234,0.60); }
+  .eb-drawer-footer { padding:20px 28px 28px; border-top:1px solid rgba(85,136,59,0.12); background:rgba(240,247,234,0.95); }
+  .eb-total-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; }
+  .eb-total-label { font-family:'Jost',sans-serif; font-size:0.65rem; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:#55883B; }
+  .eb-total-amount { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:#2C4A1E; }
+  .eb-buy-btn { width:100%; padding:14px; background:linear-gradient(135deg,#2C4A1E 0%,#55883B 50%,#9A6735 100%); color:#F4F9F0; border:none; border-radius:2px; cursor:pointer; font-family:'Jost',sans-serif; font-size:0.68rem; font-weight:500; letter-spacing:0.22em; text-transform:uppercase; box-shadow:0 4px 20px rgba(85,136,59,0.30); transition:all 0.25s; }
+  .eb-buy-btn:hover { box-shadow:0 6px 28px rgba(85,136,59,0.48); transform:translateY(-1px); }
+`;
 
 export default function ClienteCompras() {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos]   = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user } = useAuth();
-  const { carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, total } = useCart();
+  const { carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, actualizarCantidad, total } = useCart();
 
-  useEffect(() => { 
-    productosAPI.listarActivos().then(r => setProductos(r.data)); 
-  }, []);
+  useEffect(() => { productosAPI.listarActivos().then(r => setProductos(r.data)); }, []);
 
-  const handleAgregar = (p) => {
-    agregarAlCarrito(p);
-    toast.success(`${p.nombre} agregado al carrito`);
-  };
+  const handleAgregar = (p) => { agregarAlCarrito(p); toast.success(`${p.nombre} agregado al carrito`); };
 
   const handleComprar = async () => {
-    if (carrito.length === 0) { toast.warning('El carrito está vacío'); return; }
+    if (carrito.length === 0) { toast.warning('El carrito esta vacio'); return; }
     try {
-      const req = { 
-        idCliente: user.id, 
-        items: carrito.map(i => ({ idProducto: i.id, cantidad: i.cantidad, precio: i.precio })) 
-      };
-      const res = await clienteAPI.comprar(req);
-      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-      const link = document.createElement('a'); 
-      link.href = url; 
-      link.download = 'ticket.pdf'; 
-      link.click();
-      limpiarCarrito(); 
-      setDrawerOpen(false);
-      toast.success('¡Compra realizada! Se descargó tu ticket.');
-    } catch (e) { 
-      toast.error('Error al procesar la compra'); 
-    }
+      const res = await clienteAPI.comprar({ idCliente: user.id, items: carrito.map(i => ({ idProducto:i.id, cantidad:i.cantidad, precio:i.precio })) });
+      const url  = window.URL.createObjectURL(new Blob([res.data], { type:'application/pdf' }));
+      const link = document.createElement('a'); link.href=url; link.download='ticket.pdf'; link.click();
+      limpiarCarrito(); setDrawerOpen(false);
+      toast.success('Compra realizada. Se descargo tu ticket.');
+    } catch { toast.error('Error al procesar la compra'); }
   };
 
   return (
-    <Box sx={{ display:'flex', bgcolor:'#FAF7F4', minHeight:'100vh' }}>
+    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+      <style>{MARBLE_STYLES}</style>
+      <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-      <Box component="main" sx={{ flexGrow:1, p:3 }}>
-        <AppBar position="static" elevation={0} sx={{ mb:3, bgcolor:'#FFFFFF', borderBottom:'1px solid rgba(160,82,45,0.15)' }}>
-          <Toolbar>
-            <Typography variant="h5" fontWeight="bold" sx={{ flexGrow:1, color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>
-              Productos Disponibles
-            </Typography>
-            <Badge badgeContent={carrito.length} sx={{ '& .MuiBadge-badge':{ bgcolor:'#A0522D', color:'white' } }}>
-              <Button variant="outlined" startIcon={<ShoppingCart />} onClick={() => setDrawerOpen(true)}
-                sx={{ borderColor:'#A0522D', color:'#A0522D', '&:hover':{ borderColor:'#D4956A', bgcolor:'rgba(212,149,106,0.08)' } }}>
-                Carrito — ${total.toFixed(2)}
-              </Button>
-            </Badge>
-          </Toolbar>
-        </AppBar>
+      <Box component="main" sx={{ flexGrow:1 }}>
 
-        <Grid container spacing={2}>
-          {productos.map(p => (
-            <Grid item xs={12} sm={6} md={4} key={p.id}>
-              <Card sx={{ height:'100%', display:'flex', flexDirection:'column', borderRadius:2,
-                '&:hover':{ boxShadow:'0 6px 20px rgba(160,82,45,0.18)' } }}>
+        <div className="eb-header">
+          <div>
+            <p className="eb-subtitle">Elite Beauty — Tienda</p>
+            <h1 className="eb-title">Productos Disponibles</h1>
+          </div>
+          <button className="eb-cart-btn" onClick={() => setDrawerOpen(true)}>
+            <ShoppingCart style={{ fontSize:16 }} />
+            Carrito — ${total.toFixed(2)}
+            {carrito.length > 0 && <span className="eb-cart-badge">{carrito.length}</span>}
+          </button>
+        </div>
+
+        <div className="eb-content">
+          <p className="eb-section-label">{productos.length} producto(s) disponible(s)</p>
+          <div className="eb-products-grid">
+            {productos.map(p => (
+              <div className="eb-product-card eb-card-wrap" key={p.id}>
                 {p.imagenPath
-                  ? <CardMedia component="img" height="160" image={`http://localhost:8080/api${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
-                  : <Box sx={{ height:160, bgcolor:'#F5E6D8', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <Typography fontSize={40}>💄</Typography></Box>
+                  ? <img className="eb-product-img" src={`${BASE}${p.imagenPath}`} alt={p.nombre} />
+                  : <div className="eb-product-placeholder">◈</div>
                 }
-                <CardContent sx={{ flexGrow:1 }}>
-                  <Typography variant="h6" sx={{ color:'#3d2b26' }}>{p.nombre}</Typography>
-                  <Typography variant="body2" color="text.secondary">{p.marca} | {p.categoria}</Typography>
-                  <Typography variant="h6" mt={1} sx={{ color:'#A0522D' }} fontWeight="bold">${p.precio?.toFixed(2)}</Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" variant="contained" startIcon={<Add />} onClick={() => handleAgregar(p)}
-                    sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
-                    Agregar
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                <div className="eb-product-body">
+                  <div className="eb-product-name">{p.nombre}</div>
+                  <div className="eb-product-meta">{p.marca} · {p.categoria}</div>
+                  <div className="eb-product-footer">
+                    <span className="eb-product-price">${p.precio?.toFixed(2)}</span>
+                    <button className="eb-add-btn" onClick={() => handleAgregar(p)}>
+                      <Add style={{ fontSize:14 }} /> Agregar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box sx={{ width:320, p:2 }}>
-            <Typography variant="h6" fontWeight="bold" mb={2} sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>
-              🛒 Carrito
-            </Typography>
-            <List>
-              {carrito.map(item => (
-                <ListItem key={item.id} secondaryAction={
-                  <Button size="small" sx={{ color:'#A0522D' }} onClick={() => eliminarDelCarrito(item.id)}>✕</Button>}>
-                  <ListItemText 
-                    primary={item.nombre} 
-                    secondary={`x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}`} 
-                  />
-                </ListItem>
-              ))}
-            </List>
-            {carrito.length > 0 && (
+        <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}
+          PaperProps={{ sx:{ bgcolor:'#EDF5E4', boxShadow:'-8px 0 40px rgba(44,74,30,0.12)' } }}>
+          <div style={{ width:360, height:'100%', display:'flex', flexDirection:'column' }}>
+            <div className="eb-drawer-header">
+              <p className="eb-drawer-subtitle">Elite Beauty</p>
+              <h2 className="eb-drawer-title">Tu Carrito</h2>
+            </div>
+
+            {carrito.length === 0 ? (
+              <div className="eb-drawer-empty">
+                <div style={{ fontSize:'2rem', marginBottom:12, color:'#55883B' }}>◈</div>
+                <div style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'1.2rem', fontWeight:600, color:'#55883B', marginBottom:6 }}>Carrito vacio</div>
+                <div style={{ fontFamily:'Jost,sans-serif', fontSize:'0.7rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'#9A6735' }}>
+                  <span className="eb-ornament" />Agrega productos<span className="eb-ornament" />
+                </div>
+              </div>
+            ) : (
               <>
-                <Divider />
-                <Typography variant="h6" mt={2} mb={2} sx={{ color:'#3d2b26' }}>
-                  Total: ${total.toFixed(2)}
-                </Typography>
-                <Button fullWidth variant="contained" onClick={handleComprar}
-                  sx={{ bgcolor:'#A0522D', '&:hover':{ bgcolor:'#8B4513' } }}>
-                  Comprar y Descargar Ticket
-                </Button>
+                <div style={{ flex:1, overflowY:'auto' }}>
+                  {carrito.map(item => (
+                    <div className="eb-cart-item" key={item.id}>
+                      <div className="eb-cart-item-name">{item.nombre}</div>
+                      <div className="eb-cart-item-row">
+                        <div className="eb-qty-control">
+                          <button className="eb-qty-btn" onClick={() => actualizarCantidad(item.id, item.cantidad - 1)}><Remove style={{ fontSize:14 }} /></button>
+                          <span className="eb-qty-num">{item.cantidad}</span>
+                          <button className="eb-qty-btn" onClick={() => actualizarCantidad(item.id, item.cantidad + 1)}><Add style={{ fontSize:14 }} /></button>
+                        </div>
+                        <span className="eb-cart-item-subtotal">${(item.precio * item.cantidad).toFixed(2)}</span>
+                        <button className="eb-delete-btn" onClick={() => eliminarDelCarrito(item.id)}><Delete style={{ fontSize:16 }} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="eb-drawer-footer">
+                  <div className="eb-total-row">
+                    <span className="eb-total-label">Total</span>
+                    <span className="eb-total-amount">${total.toFixed(2)}</span>
+                  </div>
+                  <button className="eb-buy-btn" onClick={handleComprar}>Comprar y descargar ticket</button>
+                </div>
               </>
             )}
-            {carrito.length === 0 && (
-              <Typography color="text.secondary" textAlign="center" mt={4}>
-                El carrito está vacío
-              </Typography>
-            )}
-          </Box>
+          </div>
         </Drawer>
+
       </Box>
     </Box>
   );

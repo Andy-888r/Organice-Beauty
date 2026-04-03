@@ -1,161 +1,144 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Card, CardMedia, CardContent, CardActionArea,
-         AppBar, Toolbar, Chip, IconButton } from '@mui/material';
+import { Box } from '@mui/material';
 import { ShoppingCart, History, Person, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/shared/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { productosAPI, bannersAPI } from '../../services/api';
+import { MARBLE_STYLES } from '../../styles/marble';
 
 const MENU = [
-  { label: 'Inicio',    icon: <ShoppingCart />, path: '/cliente' },
-  { label: 'Comprar',   icon: <ShoppingCart />, path: '/cliente/compras' },
-  { label: 'Historial', icon: <History />,      path: '/cliente/historial' },
-  { label: 'Mi Perfil', icon: <Person />,       path: '/cliente/perfil' },
+  { label:'Inicio',    icon:<ShoppingCart />, path:'/cliente' },
+  { label:'Comprar',   icon:<ShoppingCart />, path:'/cliente/compras' },
+  { label:'Historial', icon:<History />,      path:'/cliente/historial' },
+  { label:'Mi Perfil', icon:<Person />,       path:'/cliente/perfil' },
 ];
 const BASE = 'http://localhost:8080/api';
 
+const extraStyles = `
+  .eb-carousel { position:relative; border-radius:2px; overflow:hidden; height:380px; margin-bottom:48px; }
+  .eb-carousel img { width:100%; height:100%; object-fit:cover; display:block; }
+  .eb-carousel-gradient { position:absolute; bottom:0; left:0; right:0; height:55%; background:linear-gradient(transparent, rgba(20,40,12,0.80)); }
+  .eb-carousel-text { position:absolute; bottom:32px; left:36px; color:#E6F0DC; }
+  .eb-carousel-title { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; line-height:1.1; margin-bottom:6px; text-shadow:0 2px 12px rgba(0,0,0,0.5); }
+  .eb-carousel-desc { font-family:'Jost',sans-serif; font-size:0.82rem; letter-spacing:0.08em; color:rgba(230,240,220,0.85); }
+  .eb-carousel-btn { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:2px; background:rgba(44,74,30,0.35); border:1px solid rgba(193,232,153,0.30); color:#E6F0DC; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(4px); }
+  .eb-carousel-btn:hover { background:rgba(44,74,30,0.60); }
+  .eb-carousel-btn.prev { left:16px; }
+  .eb-carousel-btn.next { right:16px; }
+  .eb-carousel-dots { position:absolute; bottom:16px; right:24px; display:flex; gap:6px; }
+  .eb-carousel-dot { height:6px; border-radius:3px; cursor:pointer; transition:all 0.3s; background:rgba(230,240,220,0.45); }
+  .eb-carousel-dot.active { width:20px; background:#C1E899; }
+  .eb-carousel-dot:not(.active) { width:6px; }
+  .eb-carousel-empty { height:300px; border-radius:2px; margin-bottom:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(230,240,220,0.40); border:1px dashed rgba(85,136,59,0.30); }
+  .eb-section-header { display:flex; align-items:baseline; gap:16px; margin-bottom:24px; }
+  .eb-section-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; color:#2C4A1E; }
+  .eb-section-badge { font-family:'Jost',sans-serif; font-size:0.6rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:#55883B; background:rgba(85,136,59,0.12); padding:3px 10px; border-radius:2px; }
+  .eb-section-line { flex:1; height:1px; background:rgba(85,136,59,0.15); }
+  .eb-products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
+  .eb-product-card { border-radius:2px; overflow:hidden; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; }
+  .eb-product-card:hover { transform:translateY(-4px); box-shadow:0 10px 32px rgba(44,74,30,0.16); }
+  .eb-product-img { width:100%; height:180px; object-fit:cover; display:block; }
+  .eb-product-placeholder { width:100%; height:180px; background:rgba(85,136,59,0.10); display:flex; align-items:center; justify-content:center; font-size:2.5rem; color:#55883B; }
+  .eb-product-body { padding:16px 18px; background:rgba(248,252,244,0.90); }
+  .eb-product-name { font-family:'Jost',sans-serif; font-size:0.9rem; font-weight:500; color:#2C4A1E; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .eb-product-meta { font-family:'Jost',sans-serif; font-size:0.72rem; color:#55883B; letter-spacing:0.06em; margin-bottom:10px; }
+  .eb-product-price { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:#9A6735; }
+`;
+
 export default function ClienteDashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [banners, setBanners]         = useState([]);
-  const [productos, setProductos]     = useState([]);
-  const [slideActual, setSlideActual] = useState(0);
+  const navigate  = useNavigate();
+  const [banners, setBanners]     = useState([]);
+  const [productos, setProductos] = useState([]);
+  const [slide, setSlide]         = useState(0);
 
   useEffect(() => {
     bannersAPI.listarActivos().then(r => setBanners(r.data)).catch(() => {});
     productosAPI.listarActivos().then(r => setProductos(r.data)).catch(() => {});
   }, []);
 
-  const nuevos   = [...productos].reverse().slice(0, 6);
-  const anterior = () => setSlideActual(s => (s - 1 + banners.length) % banners.length);
-  const siguiente= () => setSlideActual(s => (s + 1) % banners.length);
+  const nuevos   = [...productos].reverse().slice(0, 8);
+  const anterior = () => setSlide(s => (s - 1 + banners.length) % banners.length);
+  const siguiente= () => setSlide(s => (s + 1) % banners.length);
 
   useEffect(() => {
     if (banners.length === 0) return;
-    const timer = setInterval(siguiente, 4000);
-    return () => clearInterval(timer);
+    const t = setInterval(siguiente, 4500);
+    return () => clearInterval(t);
   }, [banners.length]);
 
-  const slide = banners[slideActual];
+  const b = banners[slide];
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#FAF7F4', minHeight: '100vh' }}>
+    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+      <style>{MARBLE_STYLES}</style>
+      <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-      <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
-        <AppBar position="static" elevation={0}
-          sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid rgba(160,82,45,0.15)', px: 3, pt: 1 }}>
-          <Toolbar>
-            <Typography variant="h5" fontWeight="bold" sx={{ color: '#3d2b26', fontFamily: '"Cormorant Garamond", Georgia, serif', letterSpacing: '0.05em' }}>
-              ¡Hola, {user?.nombre}!
-            </Typography>
-          </Toolbar>
-        </AppBar>
+      <Box component="main" sx={{ flexGrow:1 }}>
 
-        <Box sx={{ px: 3, pb: 4, pt: 2 }}>
-          {/* Banner carrusel */}
+        <div className="eb-header">
+          <div>
+            <p className="eb-subtitle">Elite Beauty — Bienvenida</p>
+            <h1 className="eb-title">Hola, {user?.nombre}</h1>
+          </div>
+        </div>
+
+        <div className="eb-content">
           {banners.length > 0 ? (
-            <Box sx={{ position: 'relative', borderRadius: 3, overflow: 'hidden',
-              height: 360, mb: 4, boxShadow: '0 4px 24px rgba(160,82,45,0.20)' }}>
-              <Box component="img" src={`${BASE}${slide.imagenPath}`} alt={slide.titulo}
-                sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.5s' }} />
-              <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-                background: 'linear-gradient(transparent, rgba(0,0,0,0.70))' }} />
-              <Box sx={{ position: 'absolute', bottom: 28, left: 32, color: 'white' }}>
-                {slide.titulo && <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)', mb: 0.5 }}>{slide.titulo}</Typography>}
-                {slide.descripcion && <Typography variant="body1" sx={{ opacity: 0.9 }}>{slide.descripcion}</Typography>}
-              </Box>
+            <div className="eb-carousel">
+              <img src={`${BASE}${b.imagenPath}`} alt={b.titulo} />
+              <div className="eb-carousel-gradient" />
+              <div className="eb-carousel-text">
+                {b.titulo     && <div className="eb-carousel-title">{b.titulo}</div>}
+                {b.descripcion && <div className="eb-carousel-desc">{b.descripcion}</div>}
+              </div>
               {banners.length > 1 && (
                 <>
-                  <IconButton onClick={anterior} sx={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', bgcolor:'rgba(243,236,227,0.25)', color:'white', '&:hover':{ bgcolor:'rgba(243,236,227,0.40)' } }}><ChevronLeft /></IconButton>
-                  <IconButton onClick={siguiente} sx={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', bgcolor:'rgba(243,236,227,0.25)', color:'white', '&:hover':{ bgcolor:'rgba(243,236,227,0.40)' } }}><ChevronRight /></IconButton>
-                  <Box sx={{ position:'absolute', bottom:12, right:20, display:'flex', gap:0.8 }}>
+                  <button className="eb-carousel-btn prev" onClick={anterior}><ChevronLeft /></button>
+                  <button className="eb-carousel-btn next" onClick={siguiente}><ChevronRight /></button>
+                  <div className="eb-carousel-dots">
                     {banners.map((_, i) => (
-                      <Box key={i} onClick={() => setSlideActual(i)} sx={{ width: i===slideActual?20:8, height:8, borderRadius:4, bgcolor: i===slideActual?'#F3ECE3':'rgba(255,255,255,0.5)', cursor:'pointer', transition:'all 0.3s' }} />
+                      <div key={i} className={`eb-carousel-dot ${i===slide?'active':''}`} onClick={() => setSlide(i)} />
                     ))}
-                  </Box>
+                  </div>
                 </>
               )}
-            </Box>
+            </div>
           ) : (
-            <Box sx={{ height:300, borderRadius:3, mb:4, display:'flex', alignItems:'center', justifyContent:'center',
-              background:'linear-gradient(135deg, #F3ECE3, #F5E6D8)', border:'2px dashed #D4956A' }}>
-              <Box sx={{ textAlign:'center' }}>
-                <Typography variant="h2">💄</Typography>
-                <Typography variant="h6" sx={{ color:'#A0522D' }} fontWeight="bold">Elite Beauty</Typography>
-                <Typography variant="body2" color="text.secondary">Agrega banners desde el panel de administrador</Typography>
-              </Box>
-            </Box>
+            <div className="eb-carousel-empty">
+              <div style={{ fontSize:'2.5rem', marginBottom:12, color:'#55883B' }}>◈</div>
+              <div style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'1.3rem', fontWeight:600, color:'#55883B' }}>Elite Beauty</div>
+              <div style={{ fontFamily:'Jost,sans-serif', fontSize:'0.7rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'#9A6735', marginTop:4 }}>Proximamente nuevas colecciones</div>
+            </div>
           )}
 
-          {/* Nuevos productos */}
           {nuevos.length > 0 && (
             <>
-              <Box sx={{ display:'flex', alignItems:'center', mb:2, gap:1 }}>
-                <Typography variant="h6" fontWeight="bold" sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif' }}>Nuevos productos</Typography>
-                <Chip label="Recién agregados" size="small" sx={{ bgcolor:'#F5E6D8', color:'#A0522D', fontWeight:'bold' }} />
-              </Box>
-              <Grid container spacing={2}>
+              <div className="eb-section-header">
+                <span className="eb-section-title">Nuevos productos</span>
+                <span className="eb-section-badge">Recien agregados</span>
+                <div className="eb-section-line" />
+              </div>
+              <div className="eb-products-grid">
                 {nuevos.map(p => (
-                  <Grid item xs={12} sm={6} md={4} key={p.id}>
-                    <Card sx={{ borderRadius:2, overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s',
-                      '&:hover':{ transform:'translateY(-4px)', boxShadow:'0 8px 24px rgba(160,82,45,0.20)' } }}>
-                      <CardActionArea onClick={() => navigate('/cliente/compras')}>
-                        {p.imagenPath
-                          ? <CardMedia component="img" height="160" image={`${BASE}${p.imagenPath}`} alt={p.nombre} sx={{ objectFit:'cover' }} />
-                          : <Box sx={{ height:160, bgcolor:'#F5E6D8', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                              <Typography fontSize={48}>💄</Typography></Box>
-                        }
-                        <CardContent sx={{ pb:2 }}>
-                          <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ color:'#3d2b26' }}>{p.nombre}</Typography>
-                          <Typography variant="body2" color="text.secondary" noWrap>{p.marca} · {p.categoria}</Typography>
-                          <Typography variant="h6" fontWeight="bold" mt={0.5} sx={{ color:'#A0522D' }}>${p.precio?.toFixed(2)}</Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
+                  <div className="eb-product-card eb-card-wrap" key={p.id} onClick={() => navigate('/cliente/compras')}>
+                    {p.imagenPath
+                      ? <img className="eb-product-img" src={`${BASE}${p.imagenPath}`} alt={p.nombre} />
+                      : <div className="eb-product-placeholder">◈</div>
+                    }
+                    <div className="eb-product-body">
+                      <div className="eb-product-name">{p.nombre}</div>
+                      <div className="eb-product-meta">{p.marca} · {p.categoria}</div>
+                      <div className="eb-product-price">${p.precio?.toFixed(2)}</div>
+                    </div>
+                  </div>
                 ))}
-              </Grid>
+              </div>
             </>
           )}
-        </Box>
+        </div>
       </Box>
     </Box>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

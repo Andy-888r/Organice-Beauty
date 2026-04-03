@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Box, Button, TextField, Typography, Paper, Alert,
-  CircularProgress, InputAdornment, IconButton
-} from '@mui/material';
+import { Alert, CircularProgress } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
@@ -16,137 +13,184 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
   const handleSubmit = async (e) => {
     e.preventDefault(); setLoading(true); setError('');
     try {
       const res = await authAPI.login(form);
       login(res.data);
-      const rol = res.data.rol?.toLowerCase();
-     navigate(rol === 'admin' ? '/admin' : '/cliente');
+      navigate(res.data.rol?.toLowerCase() === 'admin' ? '/admin' : '/cliente');
     } catch (err) {
-      setError(err.response?.data || 'Error al iniciar sesión');
+      setError(err.response?.data || 'Error al iniciar sesion');
     } finally { setLoading(false); }
   };
 
+  const styles = `
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .eb-login-bg {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      background: #E8F2E0;
+    }
+
+    /* Textura marmol verde-dorado */
+    .eb-marble {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 20%, rgba(85,136,59,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 85% 75%, rgba(85,136,59,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 30% 80%, rgba(44,74,30,0.12) 0%, transparent 60%),
+        linear-gradient(135deg, #F0F7EA 0%, #E8F2E0 40%, #EDF5E4 70%, #F2F8EE 100%);
+    }
+    /* Vetas doradas */
+    .eb-marble::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(105deg, transparent 30%, rgba(201,168,76,0.12) 31%, rgba(201,168,76,0.06) 32%, transparent 33%),
+        linear-gradient(78deg,  transparent 50%, rgba(201,168,76,0.10) 51%, rgba(201,168,76,0.04) 52%, transparent 53%),
+        linear-gradient(125deg, transparent 60%, rgba(201,168,76,0.08) 61%, transparent 62%);
+    }
+    /* Vetas verdes oscuras */
+    .eb-marble::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(115deg, transparent 20%, rgba(44,74,30,0.07) 21%, transparent 23%),
+        linear-gradient(88deg,  transparent 65%, rgba(85,136,59,0.08) 66%, transparent 68%);
+    }
+
+    .eb-login-card {
+      position: relative; z-index: 1; width: 420px;
+      background: rgba(248,250,246,0.88);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(201,168,76,0.35);
+      box-shadow:
+        0 20px 60px rgba(44,74,30,0.18),
+        0 4px 20px rgba(201,168,76,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.80);
+      border-radius: 4px; padding: 48px 44px;
+    }
+
+    .eb-login-logo-wrap {
+      display: flex; flex-direction: column; align-items: center; margin-bottom: 36px;
+    }
+    .eb-login-logo-box {
+      width: 80px; height: 80px; border-radius: 4px; overflow: hidden;
+      background: #fff;
+      border: 1px solid rgba(201,168,76,0.40);
+      box-shadow: 0 6px 24px rgba(44,74,30,0.15); margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .eb-login-brand {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem; font-weight: 600; color: #2C4A1E;
+      letter-spacing: 0.24em; text-transform: uppercase; line-height: 1;
+    }
+    .eb-login-divider {
+      width: 80px; height: 1px; margin: 10px 0;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.8), transparent);
+    }
+    .eb-login-tagline {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 0.72rem; letter-spacing: 0.22em; color: rgba(85,136,59,0.70);
+    }
+    .eb-login-heading {
+      font-family: 'Jost', sans-serif; font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.28em; text-transform: uppercase; color: rgba(44,74,30,0.50);
+      text-align: center; margin-bottom: 28px;
+    }
+    .eb-field-wrap { margin-bottom: 14px; }
+    .eb-field-label {
+      font-family: 'Jost', sans-serif; font-size: 0.62rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(44,74,30,0.60);
+      display: block; margin-bottom: 6px;
+    }
+    .eb-field-input {
+      width: 100%; background: rgba(230,240,220,0.50);
+      border: 1px solid rgba(154,103,53,0.25);
+      border-radius: 2px; padding: 12px 16px; color: #2C4A1E;
+      font-family: 'Jost', sans-serif; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .eb-field-input:hover { border-color: rgba(154,103,53,0.45); }
+    .eb-field-input:focus {
+      border-color: rgba(154,103,53,0.70);
+      box-shadow: 0 0 0 3px rgba(154,103,53,0.08);
+    }
+    .eb-field-input::placeholder { color: rgba(44,74,30,0.30); }
+    .eb-field-pass { position: relative; }
+    .eb-field-pass input { padding-right: 44px; }
+    .eb-field-pass button {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: rgba(44,74,30,0.40); padding: 0; display: flex; transition: color 0.2s;
+    }
+    .eb-field-pass button:hover { color: #55883B; }
+    .eb-btn-submit {
+      width: 100%; margin-top: 28px; padding: 14px;
+      background: linear-gradient(135deg, #2C4A1E 0%, #55883B 50%, #9A6735 100%);
+      color: #F8FAF6; border: none; border-radius: 2px; cursor: pointer;
+      font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      box-shadow: 0 4px 20px rgba(85,136,59,0.35); transition: all 0.25s;
+    }
+    .eb-btn-submit:hover { box-shadow: 0 6px 28px rgba(85,136,59,0.50); transform: translateY(-1px); }
+    .eb-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .eb-login-footer {
+      margin-top: 24px; text-align: center;
+      font-family: 'Jost', sans-serif; font-size: 0.72rem;
+      color: rgba(44,74,30,0.45); letter-spacing: 0.06em;
+    }
+    .eb-login-footer a { color: #55883B; font-style: italic; text-decoration: none; }
+    .eb-login-footer a:hover { color: #2C4A1E; }
+  `;
+
   return (
-    <Box sx={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(145deg, #0a0806 0%, #1a1210 40%, #0a0806 100%)',
-      position: 'relative', overflow: 'hidden',
-      '&::before': {
-        content: '""', position: 'absolute', top: '-20%', left: '-10%',
-        width: '500px', height: '500px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(145,118,110,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      },
-      '&::after': {
-        content: '""', position: 'absolute', bottom: '-20%', right: '-10%',
-        width: '600px', height: '600px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(200,161,156,0.10) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      },
-    }}>
-      <Box sx={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(145,118,110,0.03) 60px, rgba(145,118,110,0.03) 61px)',
-        pointerEvents: 'none',
-      }} />
-
-      <Paper elevation={0} sx={{
-        p: '40px 44px', width: 420, borderRadius: '20px',
-        background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(24px)',
-        border: '1px solid rgba(243,236,227,0.12)',
-        boxShadow: '0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(243,236,227,0.08)',
-        position: 'relative', zIndex: 1,
-      }}>
-        {/* Logo */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
-          <Box sx={{
-            width: 90, height: 90, borderRadius: '18px', overflow: 'hidden',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#F3ECE3', border: '1px solid rgba(243,236,227,0.30)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)', mb: 2.5,
-          }}>
+    <div className="eb-login-bg">
+      <style>{styles}</style>
+      <div className="eb-marble" />
+      <div className="eb-login-card">
+        <div className="eb-login-logo-wrap">
+          <div className="eb-login-logo-box">
             <img src="/logo_elite_beauty.png" alt="Elite Beauty"
-              style={{ width: '85%', height: '85%', objectFit: 'contain' }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          </Box>
-          <Typography sx={{
-            fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
-            fontSize: '1.55rem', fontWeight: 600, color: '#F3ECE3',
-            letterSpacing: '0.20em', textTransform: 'uppercase', lineHeight: 1, mb: 0.5,
-          }}>Elite Beauty</Typography>
-          <Box sx={{ width: 120, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(200,161,156,0.8), transparent)', my: 1 }} />
-          <Typography sx={{
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
-            fontSize: '0.75rem', fontStyle: 'italic',
-            color: 'rgba(243,236,227,0.45)', letterSpacing: '0.25em',
-          }}>ventas y inventarios</Typography>
-        </Box>
-
-        <Typography sx={{
-          fontSize: '0.82rem', color: 'rgba(243,236,227,0.50)',
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          textAlign: 'center', mb: 3, fontFamily: 'Georgia, serif',
-        }}>Iniciar sesión</Typography>
-
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2, fontSize: '0.82rem' }}>{error}</Alert>}
-
+              style={{ width:'85%', height:'85%', objectFit:'contain' }}
+              onError={e => { e.target.style.display='none'; }} />
+          </div>
+          <span className="eb-login-brand">Elite Beauty</span>
+          <div className="eb-login-divider" />
+          <span className="eb-login-tagline">ventas & inventarios</span>
+        </div>
+        <p className="eb-login-heading">Iniciar sesion</p>
+        {error && <Alert severity="error" sx={{ mb:2, borderRadius:'2px', fontSize:'0.8rem' }}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
-          <TextField fullWidth label="Usuario" name="usuario" value={form.usuario}
-            onChange={handleChange} margin="normal" required autoFocus sx={fieldStyle} />
-          <TextField fullWidth label="Contraseña" name="contrasena"
-            type={verContrasena ? 'text' : 'password'} value={form.contrasena}
-            onChange={handleChange} margin="normal" required sx={fieldStyle}
-            InputProps={{ endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setVerContrasena(!verContrasena)} edge="end"
-                  sx={{ color: 'rgba(243,236,227,0.45)', '&:hover': { color: '#C8A19C' } }}>
-                  {verContrasena ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                </IconButton>
-              </InputAdornment>
-            )}} />
-          <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}
-            sx={{
-              mt: 3, mb: 1, py: 1.4, borderRadius: '12px',
-              background: 'linear-gradient(135deg, #91766E 0%, #C8A19C 100%)',
-              fontSize: '0.82rem', letterSpacing: '0.18em', textTransform: 'uppercase',
-              fontFamily: 'Georgia, serif', fontWeight: 600,
-              boxShadow: '0 4px 20px rgba(145,118,110,0.40)',
-              border: '1px solid rgba(243,236,227,0.10)', transition: 'all 0.25s ease',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #7a6159 0%, #b8908a 100%)',
-                boxShadow: '0 6px 28px rgba(145,118,110,0.55)', transform: 'translateY(-1px)',
-              },
-              '&:active': { transform: 'translateY(0)' },
-              '&.Mui-disabled': { opacity: 0.5 },
-            }}>
-            {loading ? <CircularProgress size={22} sx={{ color: 'white' }} /> : 'Entrar'}
-          </Button>
+          <div className="eb-field-wrap">
+            <label className="eb-field-label">Usuario</label>
+            <input className="eb-field-input" type="text" placeholder="Tu usuario"
+              value={form.usuario} onChange={e => setForm({...form, usuario: e.target.value})} required autoFocus />
+          </div>
+          <div className="eb-field-wrap">
+            <label className="eb-field-label">Contrasena</label>
+            <div className="eb-field-pass">
+              <input className="eb-field-input" type={verContrasena ? 'text' : 'password'} placeholder="••••••••"
+                value={form.contrasena} onChange={e => setForm({...form, contrasena: e.target.value})} required />
+              <button type="button" onClick={() => setVerContrasena(!verContrasena)}>
+                {verContrasena ? <VisibilityOff style={{ fontSize:18 }} /> : <Visibility style={{ fontSize:18 }} />}
+              </button>
+            </div>
+          </div>
+          <button className="eb-btn-submit" type="submit" disabled={loading}>
+            {loading ? <CircularProgress size={18} sx={{ color:'#F8FAF6' }} /> : 'Entrar'}
+          </button>
         </form>
-
-        <Box mt={2.5} textAlign="center">
-          <Typography variant="body2" sx={{ color: 'rgba(243,236,227,0.35)', fontSize: '0.78rem' }}>
-            ¿Nuevo cliente?{' '}
-            <Link to="/registro/cliente" style={{ color: '#C8A19C', textDecoration: 'none', fontStyle: 'italic' }}>
-              Regístrate aquí
-            </Link>
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
+        <p className="eb-login-footer">
+          Nuevo cliente?{' '}
+          <Link to="/registro/cliente">Registrate aqui</Link>
+        </p>
+      </div>
+    </div>
   );
 }
-
-const fieldStyle = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '10px', color: '#F3ECE3', background: 'rgba(255,255,255,0.05)',
-    '& fieldset': { borderColor: 'rgba(243,236,227,0.15)' },
-    '&:hover fieldset': { borderColor: 'rgba(200,161,156,0.55)' },
-    '&.Mui-focused fieldset': { borderColor: '#C8A19C' },
-  },
-  '& .MuiInputLabel-root': { color: 'rgba(243,236,227,0.45)', fontSize: '0.88rem' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#C8A19C' },
-};

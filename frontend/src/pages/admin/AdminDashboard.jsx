@@ -1,95 +1,150 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, AppBar, Toolbar } from '@mui/material';
-import { Inventory, People, Store, Notifications, Assessment } from '@mui/icons-material';
+import { Box, Chip } from '@mui/material';
+import { Assessment, Inventory, People, Store, Notifications } from '@mui/icons-material';
 import Sidebar from '../../components/shared/Sidebar';
-import { solicitudesAPI, adminAPI, productosAPI } from '../../services/api';
+import { inventarioAPI } from '../../services/api';
+import { MARBLE_STYLES } from '../../styles/marble';
 
 const MENU = [
-  { label: 'Dashboard',   icon: <Assessment />,    path: '/admin' },
-  { label: 'Productos',   icon: <Inventory />,     path: '/admin/productos' },
-  { label: 'Banners',     icon: <Assessment />,    path: '/admin/banners' },
-  { label: 'Clientes',    icon: <People />,        path: '/admin/clientes' },
-  { label: 'Proveedores', icon: <Store />,         path: '/admin/proveedores' },
-  { label: 'Inventario',  icon: <Inventory />,     path: '/admin/inventario' },
-  { label: 'Solicitudes', icon: <Notifications />, path: '/admin/solicitudes' },
-  { label: 'Reportes',    icon: <Assessment />,    path: '/admin/reportes' },
+  { label:'Inicio',      icon:<Assessment />,    path:'/admin' },
+  { label:'Productos',   icon:<Inventory />,     path:'/admin/productos' },
+  { label:'Banners',     icon:<Assessment />,    path:'/admin/banners' },
+  { label:'Clientes',    icon:<People />,        path:'/admin/clientes' },
+  { label:'Proveedores', icon:<Store />,         path:'/admin/proveedores' },
+  { label:'Inventario',  icon:<Inventory />,     path:'/admin/inventario' },
+  { label:'Solicitudes', icon:<Notifications />, path:'/admin/solicitudes' },
+  { label:'Reportes',    icon:<Assessment />,    path:'/admin/reportes' },
 ];
 
+const estadoChipClass = (e) => e === 'SIN STOCK' ? 'eb-chip-sinstock' : e === 'BAJO' ? 'eb-chip-bajo' : 'eb-chip-ok';
+
+const extraStyles = `
+  .eb-loading { text-align:center; padding:80px 20px; font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; color:#55883B; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .eb-loading { animation:pulse 1.6s ease-in-out infinite; }
+  .eb-summary-row { display:flex; gap:20px; margin-bottom:36px; }
+  .eb-stock-num { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; }
+  .eb-stock-num.ok      { color:#55883B; }
+  .eb-stock-num.warning { color:#9A6735; }
+  .eb-stock-num.error   { color:#8B2E2E; }
+`;
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ solicitudes:0, clientes:0, proveedores:0, productos:0 });
+  const [alertas, setAlertas]   = useState([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    Promise.all([solicitudesAPI.contarPendientes(), adminAPI.clientes(), adminAPI.proveedores(), productosAPI.listarTodos()])
-      .then(([sol, cli, prov, prod]) => {
-        setStats({ solicitudes: sol.data.total, clientes: cli.data.length, proveedores: prov.data.length, productos: prod.data.length });
-      });
+    inventarioAPI.listar()
+      .then(r => {
+        const criticos = r.data.filter(i => i.estado === 'BAJO' || i.estado === 'SIN STOCK');
+        criticos.sort((a, b) => {
+          if (a.estado === 'SIN STOCK' && b.estado !== 'SIN STOCK') return -1;
+          if (b.estado === 'SIN STOCK' && a.estado !== 'SIN STOCK') return 1;
+          return 0;
+        });
+        setAlertas(criticos);
+      })
+      .finally(() => setCargando(false));
   }, []);
 
-  const cards = [
-    { label:'Solicitudes Pendientes', value:stats.solicitudes, color:'#A0522D', bg:'#F5E6D8', icon:'📋' },
-    { label:'Clientes Registrados',   value:stats.clientes,    color:'#6b8fa3', bg:'#dce8f0', icon:'👥' },
-    { label:'Proveedores Activos',     value:stats.proveedores, color:'#6a9b7a', bg:'#dceee3', icon:'🏪' },
-    { label:'Productos en Sistema',    value:stats.productos,   color:'#b09060', bg:'#f0e8d8', icon:'📦' },
-  ];
+  const sinStock = alertas.filter(i => i.estado === 'SIN STOCK').length;
+  const bajo     = alertas.filter(i => i.estado === 'BAJO').length;
 
   return (
-    <Box sx={{ display:'flex', bgcolor:'#FAF7F4', minHeight:'100vh' }}>
+    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+      <style>{MARBLE_STYLES}</style>
+      <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-      <Box component="main" sx={{ flexGrow:1, p:3 }}>
-        <AppBar position="static" elevation={0} sx={{ mb:3, bgcolor:'#FFFFFF', borderBottom:'1px solid rgba(160,82,45,0.15)' }}>
-          <Toolbar><Typography variant="h5" fontWeight="bold" sx={{ color:'#3d2b26', fontFamily:'"Cormorant Garamond", Georgia, serif', letterSpacing:'0.05em' }}>Panel de Administración</Typography></Toolbar>
-        </AppBar>
-        <Grid container spacing={3}>
-          {cards.map(c => (
-            <Grid item xs={12} sm={6} md={3} key={c.label}>
-              <Card sx={{ borderLeft:`4px solid ${c.color}`, borderRadius:2, bgcolor:'#FFFFFF',
-                boxShadow:'0 2px 12px rgba(160,82,45,0.10)', '&:hover':{ boxShadow:'0 4px 20px rgba(160,82,45,0.18)' }, transition:'box-shadow 0.2s' }}>
-                <CardContent>
-                  <Typography variant="h3">{c.icon}</Typography>
-                  <Typography variant="h4" fontWeight="bold" sx={{ color:c.color }}>{c.value}</Typography>
-                  <Typography variant="body2" color="text.secondary">{c.label}</Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+      <Box component="main" sx={{ flexGrow:1 }}>
+
+        <div className="eb-header">
+          <div>
+            <p className="eb-subtitle">Elite Beauty — Panel</p>
+            <h1 className="eb-title">Alertas de Inventario</h1>
+          </div>
+          <div style={{ fontFamily:'Jost,sans-serif', fontSize:'0.72rem', letterSpacing:'0.12em', color:'#9A6735', textTransform:'uppercase' }}>
+            {new Date().toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}
+          </div>
+        </div>
+
+        <div className="eb-content">
+          {cargando ? (
+            <div className="eb-loading">Verificando inventario...</div>
+          ) : alertas.length === 0 ? (
+            <div className="eb-empty">
+              <div className="eb-empty-icon">✓</div>
+              <div className="eb-empty-title">Inventario en orden</div>
+              <div className="eb-empty-sub">
+                <span className="eb-ornament" />
+                Todos los productos tienen stock suficiente
+                <span className="eb-ornament" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="eb-summary-row">
+                {sinStock > 0 && (
+                  <div className="eb-summary-card error">
+                    <div>
+                      <div className="eb-card-num">{sinStock}</div>
+                      <div className="eb-card-label">Sin stock</div>
+                    </div>
+                    <span className="eb-card-icon">⚠</span>
+                  </div>
+                )}
+                {bajo > 0 && (
+                  <div className="eb-summary-card warning">
+                    <div>
+                      <div className="eb-card-num">{bajo}</div>
+                      <div className="eb-card-label">Stock bajo</div>
+                    </div>
+                    <span className="eb-card-icon">↓</span>
+                  </div>
+                )}
+                <div className="eb-summary-card neutral">
+                  <div>
+                    <div className="eb-card-num">{alertas.length}</div>
+                    <div className="eb-card-label">Total alertas</div>
+                  </div>
+                  <span className="eb-card-icon">◈</span>
+                </div>
+              </div>
+
+              <p className="eb-section-label">Productos que requieren atencion</p>
+              <div className="eb-table-wrap">
+                <table className="eb-table">
+                  <thead>
+                    <tr>
+                      <th>Producto</th>
+                      <th>Marca</th>
+                      <th>Stock actual</th>
+                      <th>Minimo</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {alertas.map((i, idx) => (
+                      <tr key={idx}>
+                        <td style={{ fontWeight:500 }}>{i.producto?.nombre}</td>
+                        <td style={{ color:'#55883B', fontSize:'0.82rem' }}>{i.producto?.marca ?? '—'}</td>
+                        <td>
+                          <span className={`eb-stock-num ${i.estado === 'SIN STOCK' ? 'error' : 'warning'}`}>
+                            {i.stock}
+                          </span>
+                        </td>
+                        <td style={{ color:'#9A6735' }}>{i.minimo}</td>
+                        <td>
+                          <Chip label={i.estado} size="small" className={estadoChipClass(i.estado)} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
       </Box>
     </Box>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

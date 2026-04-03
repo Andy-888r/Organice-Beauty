@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CartProvider } from './context/CartContext';
-
-
 import { AuthProvider, useAuth } from './context/AuthContext';
+import InactivityWatcher from './components/shared/InactivityWatcher';
 
 // Páginas comunes
 import Login from './pages/Login';
@@ -39,30 +38,35 @@ function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <Routes>
-      {/* Rutas públicas */}
-      <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${user.rol.toLowerCase()}`} />} />
-      <Route path="/registro/cliente" element={<RegistroCliente />} />
+    <>
+      {/* Timer de inactividad — solo cuando hay sesión activa */}
+      {user && <InactivityWatcher />}
 
-      {/* Rutas Admin */}
-      <Route path="/admin" element={<ProtectedRoute roles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/productos" element={<ProtectedRoute roles={['ADMIN']}><AdminProductos /></ProtectedRoute>} />
-      <Route path="/admin/clientes" element={<ProtectedRoute roles={['ADMIN']}><AdminClientes /></ProtectedRoute>} />
-      <Route path="/admin/proveedores" element={<ProtectedRoute roles={['ADMIN']}><AdminProveedores /></ProtectedRoute>} />
-      <Route path="/admin/inventario" element={<ProtectedRoute roles={['ADMIN']}><AdminInventario /></ProtectedRoute>} />
-      <Route path="/admin/solicitudes" element={<ProtectedRoute roles={['ADMIN']}><AdminSolicitudes /></ProtectedRoute>} />
-      <Route path="/admin/reportes" element={<ProtectedRoute roles={['ADMIN']}><AdminReportes /></ProtectedRoute>} />
-      <Route path="/admin/banners" element={<ProtectedRoute roles={['ADMIN']}><AdminBanners /></ProtectedRoute>} />
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${user.rol.toLowerCase()}`} />} />
+        <Route path="/registro/cliente" element={<RegistroCliente />} />
 
-      {/* Rutas Cliente */}
-      <Route path="/cliente" element={<ProtectedRoute roles={['CLIENTE']}><ClienteDashboard /></ProtectedRoute>} />
-      <Route path="/cliente/compras" element={<ProtectedRoute roles={['CLIENTE']}><ClienteCompras /></ProtectedRoute>} />
-      <Route path="/cliente/historial" element={<ProtectedRoute roles={['CLIENTE']}><ClienteHistorial /></ProtectedRoute>} />
-      <Route path="/cliente/perfil" element={<ProtectedRoute roles={['CLIENTE']}><ClientePerfil /></ProtectedRoute>} />
+        {/* Rutas Admin */}
+        <Route path="/admin" element={<ProtectedRoute roles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/productos" element={<ProtectedRoute roles={['ADMIN']}><AdminProductos /></ProtectedRoute>} />
+        <Route path="/admin/clientes" element={<ProtectedRoute roles={['ADMIN']}><AdminClientes /></ProtectedRoute>} />
+        <Route path="/admin/proveedores" element={<ProtectedRoute roles={['ADMIN']}><AdminProveedores /></ProtectedRoute>} />
+        <Route path="/admin/inventario" element={<ProtectedRoute roles={['ADMIN']}><AdminInventario /></ProtectedRoute>} />
+        <Route path="/admin/solicitudes" element={<ProtectedRoute roles={['ADMIN']}><AdminSolicitudes /></ProtectedRoute>} />
+        <Route path="/admin/reportes" element={<ProtectedRoute roles={['ADMIN']}><AdminReportes /></ProtectedRoute>} />
+        <Route path="/admin/banners" element={<ProtectedRoute roles={['ADMIN']}><AdminBanners /></ProtectedRoute>} />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        {/* Rutas Cliente */}
+        <Route path="/cliente" element={<ProtectedRoute roles={['CLIENTE']}><ClienteDashboard /></ProtectedRoute>} />
+        <Route path="/cliente/compras" element={<ProtectedRoute roles={['CLIENTE']}><ClienteCompras /></ProtectedRoute>} />
+        <Route path="/cliente/historial" element={<ProtectedRoute roles={['CLIENTE']}><ClienteHistorial /></ProtectedRoute>} />
+        <Route path="/cliente/perfil" element={<ProtectedRoute roles={['CLIENTE']}><ClientePerfil /></ProtectedRoute>} />
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </>
   );
 }
 
@@ -70,10 +74,10 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-      <Router>
-        <AppRoutes />
-        <ToastContainer position="top-right" autoClose={3000} />
-      </Router>
+        <Router>
+          <AppRoutes />
+          <ToastContainer position="top-right" autoClose={3000} />
+        </Router>
       </CartProvider>
     </AuthProvider>
   );

@@ -1,180 +1,500 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
-  Typography, Box, Divider, Avatar, IconButton, Tooltip } from '@mui/material';
+import { Drawer, Tooltip } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 
-const DRAWER_OPEN = 240;
+const DRAWER_OPEN   = 260;
 const DRAWER_CLOSED = 64;
+
+const IconInicio = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z"/>
+    <path d="M9 22V12h6v10"/>
+  </svg>
+);
+const IconProductos = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+    <circle cx="7" cy="7" r="1.2" fill={color} stroke="none"/>
+  </svg>
+);
+const IconBanners = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="4" width="20" height="13" rx="2"/>
+    <path d="M8 20h8M12 17v3"/>
+    <path d="M6 8.5l3 3 4-4 3 2.5"/>
+    <circle cx="8.5" cy="7.5" r="1" fill={color} stroke="none"/>
+  </svg>
+);
+const IconClientes = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="7" r="3.5"/>
+    <path d="M2 21c0-4 3.13-7 7-7s7 3 7 7"/>
+    <circle cx="18" cy="8" r="2.5"/>
+    <path d="M22 21c0-2.5-1.8-4.5-4-5"/>
+  </svg>
+);
+const IconProveedores = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/>
+    <path d="M9 22V12h6v10M9 12h6"/>
+    <circle cx="12" cy="7.5" r="1.2" fill={color} stroke="none"/>
+  </svg>
+);
+const IconInventario = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="3" width="20" height="5" rx="1.5"/>
+    <rect x="2" y="10" width="20" height="5" rx="1.5"/>
+    <rect x="2" y="17" width="20" height="5" rx="1.5"/>
+    <line x1="6" y1="5.5" x2="6" y2="5.5" strokeWidth="2"/>
+    <line x1="6" y1="12.5" x2="6" y2="12.5" strokeWidth="2"/>
+    <line x1="6" y1="19.5" x2="6" y2="19.5" strokeWidth="2"/>
+  </svg>
+);
+const IconSolicitudes = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8h1a4 4 0 010 8h-1"/>
+    <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+    <line x1="6" y1="1" x2="6" y2="4"/>
+    <line x1="10" y1="1" x2="10" y2="4"/>
+    <line x1="14" y1="1" x2="14" y2="4"/>
+  </svg>
+);
+const IconReportes = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="8" y1="13" x2="16" y2="13"/>
+    <line x1="8" y1="17" x2="12" y2="17"/>
+  </svg>
+);
+const IconInicioCliente = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2C8 2 4 5.5 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.5-4-8-8-8z"/>
+    <circle cx="12" cy="10" r="2.5"/>
+  </svg>
+);
+const IconComprar = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+);
+const IconHistorial = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <polyline points="12 7 12 12 15.5 15.5"/>
+  </svg>
+);
+const IconPerfil = ({ color }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+    <path d="M16 3.5c1.5.8 2.5 2.3 2.5 4S17.5 10.7 16 11.5"/>
+  </svg>
+);
+
+const ICON_MAP = {
+  '/admin':             (c) => <IconInicio        color={c} />,
+  '/admin/productos':   (c) => <IconProductos     color={c} />,
+  '/admin/banners':     (c) => <IconBanners       color={c} />,
+  '/admin/clientes':    (c) => <IconClientes      color={c} />,
+  '/admin/proveedores': (c) => <IconProveedores   color={c} />,
+  '/admin/inventario':  (c) => <IconInventario    color={c} />,
+  '/admin/solicitudes': (c) => <IconSolicitudes   color={c} />,
+  '/admin/reportes':    (c) => <IconReportes      color={c} />,
+  '/cliente':           (c) => <IconInicioCliente color={c} />,
+  '/cliente/compras':   (c) => <IconComprar       color={c} />,
+  '/cliente/historial': (c) => <IconHistorial     color={c} />,
+  '/cliente/perfil':    (c) => <IconPerfil        color={c} />,
+};
+
+// ══════════════════════════════════════
+// PALETA PISTACHE
+// Fondo: #C8E6A0 (pistache medio)
+// Fondo hover: #B8DA8A
+// Activo: #2C4A1E (verde oscuro)
+// Texto: #1A3210 (casi negro verde)
+// Texto suave: #3D5E2A
+// ══════════════════════════════════════
+
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
+  .eb-sidebar * { box-sizing: border-box; }
+
+  .eb-sb-logo-box {
+    width: 38px; height: 38px; border-radius: 3px; overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(44,74,30,0.25);
+    box-shadow: 0 2px 8px rgba(44,74,30,0.15);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .eb-sb-brand {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.85rem; font-weight: 600;
+    color: #1A3210;
+    letter-spacing: 0.20em; text-transform: uppercase;
+    line-height: 1; white-space: nowrap;
+  }
+
+  .eb-sb-divider {
+    height: 1px;
+    background: rgba(44,74,30,0.18);
+    margin: 0 14px;
+  }
+  .eb-sb-divider.light { background: rgba(44,74,30,0.10); }
+
+  /* ── Items del menú ── */
+  .eb-sb-nav { padding: 6px 8px; flex: 1; }
+
+  .eb-sb-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 12px; border-radius: 6px; cursor: pointer;
+    margin-bottom: 2px; transition: all 0.18s;
+    border: none; background: transparent;
+    width: 100%; text-align: left; position: relative;
+    outline: none;
+  }
+  .eb-sb-item:hover {
+    background: rgba(44,74,30,0.10);
+  }
+  .eb-sb-item.active {
+    background: #2C4A1E;
+    box-shadow: 0 2px 10px rgba(44,74,30,0.30);
+  }
+
+  .eb-sb-item-icon {
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; width: 20px;
+    transition: transform 0.18s;
+  }
+  .eb-sb-item:hover:not(.active) .eb-sb-item-icon { transform: scale(1.10); }
+
+  .eb-sb-item-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.88rem; font-weight: 500;
+    color: #1A3210;
+    white-space: nowrap; transition: all 0.18s;
+    letter-spacing: 0.02em;
+  }
+  .eb-sb-item:hover:not(.active) .eb-sb-item-label {
+    color: #0D1F08;
+  }
+  .eb-sb-item.active .eb-sb-item-label {
+    color: #C1E899;
+    font-weight: 600;
+  }
+
+  /* Indicador lateral activo */
+  .eb-sb-item.active::after {
+    content: '';
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #C1E899;
+  }
+
+  /* ── Toggle ── */
+  .eb-sb-toggle {
+    width: 26px; height: 26px; border-radius: 4px;
+    background: rgba(44,74,30,0.12);
+    border: 1px solid rgba(44,74,30,0.20);
+    cursor: pointer; color: #2C4A1E;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .eb-sb-toggle:hover {
+    background: #2C4A1E;
+    color: #C1E899;
+    border-color: #2C4A1E;
+  }
+
+  /* ── Cerrar sesión ── */
+  .eb-sb-logout {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 12px; border-radius: 6px; cursor: pointer;
+    margin: 0 8px 10px; transition: all 0.18s;
+    border: 1px solid transparent;
+    background: transparent; width: calc(100% - 16px); text-align: left;
+  }
+  .eb-sb-logout:hover {
+    background: rgba(139,46,46,0.12);
+    border-color: rgba(139,46,46,0.20);
+  }
+  .eb-sb-logout-label {
+    font-family: 'Jost', sans-serif; font-size: 0.80rem; font-weight: 400;
+    color: rgba(44,74,30,0.55);
+    white-space: nowrap; letter-spacing: 0.04em;
+    transition: color 0.18s;
+  }
+  .eb-sb-logout:hover .eb-sb-logout-label { color: #8B2E2E; }
+`;
+
+const esAdmin = (rol) => rol?.toLowerCase() === 'admin';
 
 export default function Sidebar({ items }) {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const [open, setOpen] = useState(true);
+  const rol = user?.rol;
+  const isAdmin = esAdmin(rol);
+
+  // Colores del identificador según rol
+  const ID = {
+    // Admin: verde oscuro sobre pistache claro
+    adminBg:       '#2C4A1E',
+    adminBorder:   'rgba(44,74,30,0.80)',
+    adminFranja:   'linear-gradient(90deg, #1A3210, #2C4A1E, #55883B, #C1E899)',
+    adminAvBg:     'rgba(193,232,153,0.20)',
+    adminAvBorder: 'rgba(193,232,153,0.50)',
+    adminAvColor:  '#C1E899',
+    adminNombre:   '#E6F5D0',
+    adminBadgeBg:  'rgba(193,232,153,0.15)',
+    adminBadgeClr: '#C1E899',
+    // Cliente: dorado/café sobre pistache claro
+    clienteBg:       '#2C4A1E',
+    clienteBorder:   'rgba(44,74,30,0.80)',
+    clienteFranja:   'linear-gradient(90deg, #1A3210, #2C4A1E, #55883B, #C1E899)',
+    clienteAvBg:     'rgba(193,232,153,0.20)',
+    clienteAvBorder: 'rgba(193,232,153,0.50)',
+    clienteAvColor:  '#C1E899',
+    clienteNombre:   '#E6F5D0',
+    clienteBadgeBg:  'rgba(193,232,153,0.15)',
+    clienteBadgeClr: '#C1E899',
+  };
+
+  const bg       = isAdmin ? ID.adminBg       : ID.clienteBg;
+  const border   = isAdmin ? ID.adminBorder   : ID.clienteBorder;
+  const franja   = isAdmin ? ID.adminFranja   : ID.clienteFranja;
+  const avBg     = isAdmin ? ID.adminAvBg     : ID.clienteAvBg;
+  const avBorder = isAdmin ? ID.adminAvBorder : ID.clienteAvBorder;
+  const avColor  = isAdmin ? ID.adminAvColor  : ID.clienteAvColor;
+  const nombre   = isAdmin ? ID.adminNombre   : ID.clienteNombre;
+  const badgeBg  = isAdmin ? ID.adminBadgeBg  : ID.clienteBadgeBg;
+  const badgeClr = isAdmin ? ID.adminBadgeClr : ID.clienteBadgeClr;
 
   return (
-    <Drawer variant="permanent" sx={{
-      width: open ? DRAWER_OPEN : DRAWER_CLOSED, flexShrink: 0, transition: 'width 0.3s ease',
-      '& .MuiDrawer-paper': {
-        width: open ? DRAWER_OPEN : DRAWER_CLOSED, boxSizing: 'border-box',
-        background: 'linear-gradient(180deg, #0a0806 0%, #1a1210 60%, #0a0806 100%)',
-        color: 'white', overflowX: 'hidden', transition: 'width 0.3s ease',
-        borderRight: '1px solid rgba(160,82,45,0.25)',
-        boxShadow: '4px 0 24px rgba(0,0,0,0.40)',
-      }
-    }}>
-      {/* Encabezado */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2.5, pb: 1.5, position: 'relative' }}>
-        <IconButton onClick={() => setOpen(!open)} size="small" sx={{
-          position: 'absolute', top: 8, right: 6,
-          color: 'rgba(243,236,227,0.6)', bgcolor: 'rgba(255,255,255,0.07)',
-          '&:hover': { bgcolor: 'rgba(160,82,45,0.30)', color: '#F3ECE3' },
-          width: 26, height: 26, transition: 'all 0.2s',
-        }}>
-          {open ? <ChevronLeft fontSize="small" /> : <ChevronRight fontSize="small" />}
-        </IconButton>
+    <>
+      <style>{styles}</style>
+      <Drawer variant="permanent" className="eb-sidebar" sx={{
+        width: open ? DRAWER_OPEN : DRAWER_CLOSED,
+        flexShrink: 0,
+        transition: 'width 0.3s ease',
+        '& .MuiDrawer-paper': {
+          width: open ? DRAWER_OPEN : DRAWER_CLOSED,
+          boxSizing: 'border-box',
+          background: '#C8E6A0',
+          overflowX: 'hidden',
+          transition: 'width 0.3s ease',
+          borderRight: '1px solid rgba(44,74,30,0.25)',
+          boxShadow: '4px 0 20px rgba(44,74,30,0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+        }
+      }}>
 
+        {/* ── Header ── */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: open ? 'space-between' : 'center',
+          padding: open ? '16px 14px 14px' : '16px 0 14px',
+          gap: '10px',
+        }}>
+          {open ? (
+            <>
+              <div style={{ display:'flex', alignItems:'center', gap:'10px', minWidth:0 }}>
+                <div className="eb-sb-logo-box">
+                  <img src="/logo_elite_beauty.png" alt="EB"
+                    style={{ width:'85%', height:'85%', objectFit:'contain' }}
+                    onError={e => { e.target.style.display='none'; }} />
+                </div>
+                <span className="eb-sb-brand">Elite Beauty</span>
+              </div>
+              <button className="eb-sb-toggle" onClick={() => setOpen(false)}>
+                <ChevronLeft style={{ fontSize:15 }} />
+              </button>
+            </>
+          ) : (
+            <Tooltip title="Elite Beauty" placement="right" arrow>
+              <button className="eb-sb-toggle" onClick={() => setOpen(true)}
+                style={{ width:36, height:36 }}>
+                <ChevronRight style={{ fontSize:15 }} />
+              </button>
+            </Tooltip>
+          )}
+        </div>
+
+        <div className="eb-sb-divider" />
+
+        {/* ══════════════════════════════════════
+            IDENTIFICADOR DE USUARIO
+        ══════════════════════════════════════ */}
         {open ? (
-          <>
-            <Box sx={{
-              width: 52, height: 52, borderRadius: '12px', overflow: 'hidden',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: '#F3ECE3', border: '1px solid rgba(243,236,227,0.20)',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.40)', mb: 1,
+          <div style={{
+            margin: '10px 10px 6px',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            border: `1px solid ${border}`,
+            boxShadow: '0 3px 14px rgba(0,0,0,0.18)',
+          }}>
+            {/* Franja degradada superior */}
+            <div style={{ height:'4px', background: franja }} />
+
+            {/* Cuerpo */}
+            <div style={{
+              background: bg,
+              padding: '12px 14px',
+              display: 'flex', alignItems: 'center', gap: '12px',
             }}>
-              <img src="/logo_elite_beauty.png" alt="Elite Beauty"
-                style={{ width: '88%', height: '88%', objectFit: 'contain' }}
-                onError={e => { e.target.style.display = 'none'; }} />
-            </Box>
-            <Typography sx={{
-              fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
-              fontSize: '0.90rem', fontWeight: 600, color: '#F3ECE3',
-              letterSpacing: '0.18em', textTransform: 'uppercase', lineHeight: 1, whiteSpace: 'nowrap',
-            }}>Elite Beauty</Typography>
-          </>
+              {/* Avatar cuadrado con inicial */}
+              <div style={{
+                width: '42px', height: '42px',
+                borderRadius: '6px', flexShrink: 0,
+                background: avBg,
+                border: `1.5px solid ${avBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'relative',
+              }}>
+                <span style={{
+                  fontFamily: '"Cormorant Garamond", Georgia, serif',
+                  fontSize: '1.5rem', fontWeight: 600,
+                  color: avColor, lineHeight: 1,
+                }}>
+                  {user?.nombre?.charAt(0).toUpperCase()}
+                </span>
+                {/* Punto de estado */}
+                <div style={{
+                  position: 'absolute', bottom: '-4px', right: '-4px',
+                  width: '10px', height: '10px', borderRadius: '50%',
+                  background: avColor,
+                  border: `2px solid ${bg}`,
+                }} />
+              </div>
+
+              {/* Nombre + badge */}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{
+                  fontFamily: 'Jost, sans-serif',
+                  fontSize: '0.86rem', fontWeight: 600,
+                  color: nombre,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  lineHeight: 1.3, marginBottom: '6px',
+                }}>
+                  {user?.nombre}
+                </div>
+                {/* Badge de rol */}
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  background: badgeBg,
+                  border: `1px solid ${badgeClr}40`,
+                  padding: '3px 9px', borderRadius: '20px',
+                }}>
+                  <div style={{
+                    width: '5px', height: '5px', borderRadius: '50%',
+                    background: badgeClr, flexShrink: 0,
+                  }} />
+                  <span style={{
+                    fontFamily: 'Jost, sans-serif',
+                    fontSize: '0.58rem', fontWeight: 700,
+                    letterSpacing: '0.18em', textTransform: 'uppercase',
+                    color: badgeClr,
+                  }}>
+                    {user?.rol}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
-          <Tooltip title="Elite Beauty" placement="right" arrow>
-            <Box sx={{
-              width: 36, height: 36, borderRadius: '10px', overflow: 'hidden',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: '#F3ECE3', border: '1px solid rgba(243,236,227,0.20)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.35)',
-            }}>
-              <img src="/logo_elite_beauty.png" alt="EB"
-                style={{ width: '88%', height: '88%', objectFit: 'contain' }}
-                onError={e => { e.target.style.display = 'none'; }} />
-            </Box>
+          /* Versión colapsada */
+          <Tooltip title={`${user?.nombre} — ${user?.rol}`} placement="right" arrow>
+            <div style={{ display:'flex', justifyContent:'center', padding:'10px 0', cursor:'default' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '6px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: bg,
+                border: `1.5px solid ${border}`,
+                position: 'relative',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.20)',
+              }}>
+                <span style={{
+                  fontFamily: '"Cormorant Garamond", Georgia, serif',
+                  fontSize: '1.2rem', fontWeight: 600,
+                  color: avColor, lineHeight: 1,
+                }}>
+                  {user?.nombre?.charAt(0).toUpperCase()}
+                </span>
+                <div style={{
+                  position: 'absolute', bottom: '-3px', right: '-3px',
+                  width: '10px', height: '10px', borderRadius: '3px',
+                  background: avColor,
+                  border: `1.5px solid #C8E6A0`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <span style={{
+                    fontFamily: 'Jost, sans-serif', fontSize: '0.34rem',
+                    fontWeight: 700, color: bg,
+                  }}>
+                    {user?.rol?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            </div>
           </Tooltip>
         )}
-      </Box>
 
-      {/* Usuario */}
-      <Box sx={{ px: open ? 2 : 0.5, pb: 1.5 }}>
-        <Divider sx={{ borderColor: 'rgba(160,82,45,0.30)', mb: 1.2 }} />
-        {open ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 0.5 }}>
-            <Avatar sx={{ bgcolor: 'rgba(160,82,45,0.40)', width: 30, height: 30, fontSize: '0.78rem', border: '1px solid rgba(212,149,106,0.45)' }}>
-              {user?.nombre?.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box>
-              <Typography sx={{ fontSize: '0.80rem', color: '#F3ECE3', lineHeight: 1.3, whiteSpace: 'nowrap' }}>{user?.nombre}</Typography>
-              <Typography sx={{ fontSize: '0.66rem', color: 'rgba(243,236,227,0.42)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{user?.rol}</Typography>
-            </Box>
-          </Box>
-        ) : (
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Tooltip title={user?.nombre} placement="right" arrow>
-              <Avatar sx={{ bgcolor: 'rgba(160,82,45,0.40)', width: 30, height: 30, fontSize: '0.75rem', border: '1px solid rgba(212,149,106,0.45)' }}>
-                {user?.nombre?.charAt(0).toUpperCase()}
-              </Avatar>
-            </Tooltip>
-          </Box>
-        )}
-        <Divider sx={{ borderColor: 'rgba(160,82,45,0.18)', mt: 1.2 }} />
-      </Box>
+        <div className="eb-sb-divider light" style={{ margin:'6px 14px 0' }} />
 
-      {/* Menú */}
-      <List sx={{ pt: 0, px: open ? 0.5 : 0, flex: 1 }}>
-        {items.map(({ label, icon, path }) => {
-          const isActive = location.pathname === path;
-          return (
-            <ListItem key={path} disablePadding sx={{ display: 'block', mb: 0.2 }}>
-              <Tooltip title={!open ? label : ''} placement="right" arrow>
-                <ListItemButton selected={isActive} onClick={() => navigate(path)} sx={{
-                  minHeight: 40, justifyContent: open ? 'initial' : 'center',
-                  px: open ? 1.5 : 1, mx: open ? 0.5 : 0.3, borderRadius: '9px', transition: 'all 0.2s',
-                  '&.Mui-selected': { bgcolor: 'rgba(160,82,45,0.28)', borderLeft: '3px solid #D4956A', pl: open ? 1.2 : 0.8 },
-                  '&.Mui-selected:hover': { bgcolor: 'rgba(160,82,45,0.38)' },
-                  '&:hover': { bgcolor: 'rgba(243,236,227,0.07)' },
-                }}>
-                  <ListItemIcon sx={{ color: isActive ? '#D4956A' : 'rgba(243,236,227,0.55)', minWidth: 0, mr: open ? 1.5 : 'auto', justifyContent: 'center', transition: 'color 0.2s' }}>
-                    {icon}
-                  </ListItemIcon>
-                  {open && <ListItemText primary={label} primaryTypographyProps={{
-                    fontSize: 13.5, whiteSpace: 'nowrap',
-                    fontWeight: isActive ? 600 : 400,
-                    color: isActive ? '#F3ECE3' : 'rgba(243,236,227,0.72)',
-                    fontFamily: 'Georgia, serif', letterSpacing: '0.02em',
-                  }} />}
-                </ListItemButton>
+        {/* ── Menú ── */}
+        <div className="eb-sb-nav" style={{ flex:1 }}>
+          {items.map(({ label, path }) => {
+            const isActive  = location.pathname === path;
+            const iconColor = isActive ? '#C1E899' : '#2C4A1E';
+            const iconFn    = ICON_MAP[path];
+            return (
+              <Tooltip key={path} title={!open ? label : ''} placement="right" arrow>
+                <button
+                  className={`eb-sb-item ${isActive ? 'active' : ''}`}
+                  onClick={() => navigate(path)}
+                  style={{
+                    justifyContent: open ? 'flex-start' : 'center',
+                    paddingLeft:  open ? '12px' : '0',
+                    paddingRight: open ? '12px' : '0',
+                  }}>
+                  <span className="eb-sb-item-icon">
+                    {iconFn ? iconFn(iconColor) : null}
+                  </span>
+                  {open && <span className="eb-sb-item-label">{label}</span>}
+                </button>
               </Tooltip>
-            </ListItem>
-          );
-        })}
-      </List>
+            );
+          })}
+        </div>
 
-      {/* Cerrar sesión */}
-      <Box sx={{ px: open ? 1 : 0.3, pb: 2, pt: 0.5 }}>
-        <Divider sx={{ borderColor: 'rgba(160,82,45,0.22)', mb: 1 }} />
-        <Tooltip title={!open ? 'Cerrar sesión' : ''} placement="right" arrow>
-          <ListItemButton onClick={logout} sx={{
-            borderRadius: '9px', justifyContent: open ? 'initial' : 'center',
-            px: open ? 1.5 : 1, py: 0.8, transition: 'all 0.2s',
-            '&:hover': { bgcolor: 'rgba(160,82,45,0.22)' }
-          }}>
-            <ListItemIcon sx={{ color: 'rgba(243,236,227,0.38)', minWidth: 0, mr: open ? 1.5 : 'auto', justifyContent: 'center' }}>✕</ListItemIcon>
-            {open && <ListItemText primary="Cerrar sesión" primaryTypographyProps={{ fontSize: 13, color: 'rgba(243,236,227,0.48)', fontFamily: 'Georgia, serif', letterSpacing: '0.02em' }} />}
-          </ListItemButton>
+        <div className="eb-sb-divider light" />
+
+        {/* ── Cerrar sesión ── */}
+        <Tooltip title={!open ? 'Cerrar sesion' : ''} placement="right" arrow>
+          <button className="eb-sb-logout" onClick={logout}
+            style={{ justifyContent: open ? 'flex-start' : 'center' }}>
+            <span style={{ display:'flex', alignItems:'center', justifyContent:'center', width:20 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="rgba(44,74,30,0.55)" strokeWidth="1.5"
+                strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </span>
+            {open && <span className="eb-sb-logout-label">Cerrar sesion</span>}
+          </button>
         </Tooltip>
-      </Box>
-    </Drawer>
+
+      </Drawer>
+    </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
