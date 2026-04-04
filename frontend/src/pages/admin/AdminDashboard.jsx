@@ -4,6 +4,7 @@ import { Assessment, Inventory, People, Store, Notifications } from '@mui/icons-
 import Sidebar from '../../components/shared/Sidebar';
 import { inventarioAPI } from '../../services/api';
 import { MARBLE_STYLES } from '../../styles/marble';
+import AlertaBajoStock from '../../components/shared/AlertaBajoStock';
 
 const MENU = [
   { label:'Inicio',      icon:<Assessment />,    path:'/admin' },
@@ -49,14 +50,19 @@ export default function AdminDashboard() {
 
   const sinStock = alertas.filter(i => i.estado === 'SIN STOCK').length;
   const bajo     = alertas.filter(i => i.estado === 'BAJO').length;
+const [alertasLogin, setAlertasLogin] = useState(
+  JSON.parse(localStorage.getItem('alertas_stock') || '[]')
+);
+console.log('alertasLogin:', alertasLogin);
 
-  return (
-    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+ return (
+    <Box 
+    sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
       <style>{MARBLE_STYLES}</style>
       <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-      <Box component="main" sx={{ flexGrow:1 }}>
-
+    <Box component="main" sx={{ flexGrow:1, position:'relative' }}>
+  <AlertaBajoStock alertas={alertasLogin} />
         <div className="eb-header">
           <div>
             <p className="eb-subtitle">Elite Beauty — Panel</p>
@@ -147,4 +153,5 @@ export default function AdminDashboard() {
       </Box>
     </Box>
   );
+  
 }

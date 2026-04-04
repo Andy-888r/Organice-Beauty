@@ -14,15 +14,23 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setLoading(true); setError('');
-    try {
-      const res = await authAPI.login(form);
-      login(res.data);
-      navigate(res.data.rol?.toLowerCase() === 'admin' ? '/admin' : '/cliente');
-    } catch (err) {
-      setError(err.response?.data || 'Error al iniciar sesion');
-    } finally { setLoading(false); }
-  };
+  e.preventDefault(); setLoading(true); setError('');
+  try {
+    const res = await authAPI.login(form);
+    login(res.data);
+
+    // Guardar alertas si es ADMIN
+    if (res.data.rol?.toLowerCase() === 'admin' && res.data.alertas?.length > 0) {
+      localStorage.setItem('alertas_stock', JSON.stringify(res.data.alertas));
+    } else {
+      localStorage.removeItem('alertas_stock');
+    }
+
+    navigate(res.data.rol?.toLowerCase() === 'admin' ? '/admin' : '/cliente');
+  } catch (err) {
+    setError(err.response?.data || 'Error al iniciar sesion');
+  } finally { setLoading(false); }
+};
 
   const styles = `
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap');

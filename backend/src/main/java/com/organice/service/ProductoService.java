@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService {
@@ -16,6 +17,15 @@ public class ProductoService {
     @Autowired private ProductoRepository productoRepo;
     @Autowired private InventarioRepository inventarioRepo;
     @Autowired private LocalStorageService storageService;
+
+   public List<String> obtenerAlertasBajoStock() {
+    return inventarioRepo.findAll()
+        .stream()
+        .filter(i -> "BAJO".equals(i.getEstado()) || "SIN STOCK".equals(i.getEstado()))
+        .map(i -> "[" + i.getEstado() + "] " + i.getProducto().getNombre()
+                + " - Stock: " + i.getStock())
+        .collect(Collectors.toList());
+}
 
     public List<Producto> listarActivos() {
         return productoRepo.findByActivoTrue();
