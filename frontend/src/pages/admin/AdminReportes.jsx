@@ -12,7 +12,6 @@ const MENU = [
   { label:'Clientes',    icon:<People />,        path:'/admin/clientes' },
   { label:'Proveedores', icon:<Store />,         path:'/admin/proveedores' },
   { label:'Inventario',  icon:<Inventory />,     path:'/admin/inventario' },
-  { label:'Solicitudes', icon:<Notifications />, path:'/admin/solicitudes' },
   { label:'Reportes',    icon:<Assessment />,    path:'/admin/reportes' },
 ];
 

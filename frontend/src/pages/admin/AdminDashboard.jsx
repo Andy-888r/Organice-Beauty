@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Chip } from '@mui/material';
-import { Assessment, Inventory, People, Store, Notifications } from '@mui/icons-material';
+import { Box } from '@mui/material';
+import { Assessment, Inventory, People, Store } from '@mui/icons-material';
 import Sidebar from '../../components/shared/Sidebar';
 import { inventarioAPI } from '../../services/api';
 import { MARBLE_STYLES } from '../../styles/marble';
 import AlertaBajoStock from '../../components/shared/AlertaBajoStock';
-
+ 
 const MENU = [
   { label:'Inicio',      icon:<Assessment />,    path:'/admin' },
   { label:'Productos',   icon:<Inventory />,     path:'/admin/productos' },
@@ -13,27 +13,71 @@ const MENU = [
   { label:'Clientes',    icon:<People />,        path:'/admin/clientes' },
   { label:'Proveedores', icon:<Store />,         path:'/admin/proveedores' },
   { label:'Inventario',  icon:<Inventory />,     path:'/admin/inventario' },
-  { label:'Solicitudes', icon:<Notifications />, path:'/admin/solicitudes' },
   { label:'Reportes',    icon:<Assessment />,    path:'/admin/reportes' },
 ];
-
-const estadoChipClass = (e) => e === 'SIN STOCK' ? 'eb-chip-sinstock' : e === 'BAJO' ? 'eb-chip-bajo' : 'eb-chip-ok';
-
+ 
 const extraStyles = `
-  .eb-loading { text-align:center; padding:80px 20px; font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; color:#55883B; }
+  .eb-loading { text-align:center; padding:80px 20px; font-family:'Jost',sans-serif; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; color:#55883B; animation:pulse 1.6s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .eb-loading { animation:pulse 1.6s ease-in-out infinite; }
-  .eb-summary-row { display:flex; gap:20px; margin-bottom:36px; }
-  .eb-stock-num { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; }
-  .eb-stock-num.ok      { color:#55883B; }
-  .eb-stock-num.warning { color:#9A6735; }
-  .eb-stock-num.error   { color:#8B2E2E; }
+ 
+  /* Recuadros de resumen */
+  .eb-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .eb-summary-tile {
+    border-radius: 4px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .eb-summary-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(44,74,30,0.12); }
+ 
+  .eb-summary-tile.error   { background: rgba(139,46,46,0.06);  border-color: rgba(139,46,46,0.18); }
+  .eb-summary-tile.warning { background: rgba(154,103,53,0.07); border-color: rgba(154,103,53,0.20); }
+  .eb-summary-tile.neutral { background: rgba(85,136,59,0.07);  border-color: rgba(85,136,59,0.20); }
+ 
+  .eb-tile-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .eb-tile-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .eb-tile-num.error   { color: #8B2E2E; }
+  .eb-tile-num.warning { color: #9A6735; }
+  .eb-tile-num.neutral { color: #55883B; }
+ 
+  .eb-tile-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: #2C4A1E;
+  }
+  .eb-tile-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    color: #55883B;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
 `;
-
+ 
 export default function AdminDashboard() {
   const [alertas, setAlertas]   = useState([]);
   const [cargando, setCargando] = useState(true);
-
+ 
   useEffect(() => {
     inventarioAPI.listar()
       .then(r => {
@@ -47,22 +91,20 @@ export default function AdminDashboard() {
       })
       .finally(() => setCargando(false));
   }, []);
-
+ 
   const sinStock = alertas.filter(i => i.estado === 'SIN STOCK').length;
   const bajo     = alertas.filter(i => i.estado === 'BAJO').length;
-const [alertasLogin, setAlertasLogin] = useState(
-  JSON.parse(localStorage.getItem('alertas_stock') || '[]')
-);
-console.log('alertasLogin:', alertasLogin);
-
- return (
-    <Box 
-    sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
+ 
+  const alertasLogin = JSON.parse(localStorage.getItem('alertas_stock') || '[]');
+ 
+  return (
+    <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
       <style>{MARBLE_STYLES}</style>
       <style>{extraStyles}</style>
       <Sidebar items={MENU} />
-    <Box component="main" sx={{ flexGrow:1, position:'relative' }}>
-  <AlertaBajoStock alertas={alertasLogin} />
+      <Box component="main" sx={{ flexGrow:1, position:'relative' }}>
+        <AlertaBajoStock alertas={alertasLogin} />
+ 
         <div className="eb-header">
           <div>
             <p className="eb-subtitle">Elite Beauty — Panel</p>
@@ -72,7 +114,7 @@ console.log('alertasLogin:', alertasLogin);
             {new Date().toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}
           </div>
         </div>
-
+ 
         <div className="eb-content">
           {cargando ? (
             <div className="eb-loading">Verificando inventario...</div>
@@ -88,64 +130,36 @@ console.log('alertasLogin:', alertasLogin);
             </div>
           ) : (
             <>
-              <div className="eb-summary-row">
+              <p className="eb-section-label">Resumen de alertas</p>
+ 
+              {/* ── Solo recuadros, sin tabla ── */}
+              <div className="eb-summary-grid">
+ 
                 {sinStock > 0 && (
-                  <div className="eb-summary-card error">
-                    <div>
-                      <div className="eb-card-num">{sinStock}</div>
-                      <div className="eb-card-label">Sin stock</div>
-                    </div>
-                    <span className="eb-card-icon">⚠</span>
+                  <div className="eb-summary-tile error">
+                    <span className="eb-tile-icon">⚠</span>
+                    <div className={`eb-tile-num error`}>{sinStock}</div>
+                    <div className="eb-tile-label">Sin stock</div>
+                    <div className="eb-tile-sub">Productos agotados</div>
                   </div>
                 )}
+ 
                 {bajo > 0 && (
-                  <div className="eb-summary-card warning">
-                    <div>
-                      <div className="eb-card-num">{bajo}</div>
-                      <div className="eb-card-label">Stock bajo</div>
-                    </div>
-                    <span className="eb-card-icon">↓</span>
+                  <div className="eb-summary-tile warning">
+                    <span className="eb-tile-icon">↓</span>
+                    <div className={`eb-tile-num warning`}>{bajo}</div>
+                    <div className="eb-tile-label">Stock bajo</div>
+                    <div className="eb-tile-sub">Por debajo del mínimo</div>
                   </div>
                 )}
-                <div className="eb-summary-card neutral">
-                  <div>
-                    <div className="eb-card-num">{alertas.length}</div>
-                    <div className="eb-card-label">Total alertas</div>
-                  </div>
-                  <span className="eb-card-icon">◈</span>
+ 
+                <div className="eb-summary-tile neutral">
+                  <span className="eb-tile-icon">◈</span>
+                  <div className={`eb-tile-num neutral`}>{alertas.length}</div>
+                  <div className="eb-tile-label">Total alertas</div>
+                  <div className="eb-tile-sub">Requieren atención</div>
                 </div>
-              </div>
-
-              <p className="eb-section-label">Productos que requieren atencion</p>
-              <div className="eb-table-wrap">
-                <table className="eb-table">
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Marca</th>
-                      <th>Stock actual</th>
-                      <th>Minimo</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {alertas.map((i, idx) => (
-                      <tr key={idx}>
-                        <td style={{ fontWeight:500 }}>{i.producto?.nombre}</td>
-                        <td style={{ color:'#55883B', fontSize:'0.82rem' }}>{i.producto?.marca ?? '—'}</td>
-                        <td>
-                          <span className={`eb-stock-num ${i.estado === 'SIN STOCK' ? 'error' : 'warning'}`}>
-                            {i.stock}
-                          </span>
-                        </td>
-                        <td style={{ color:'#9A6735' }}>{i.minimo}</td>
-                        <td>
-                          <Chip label={i.estado} size="small" className={estadoChipClass(i.estado)} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+ 
               </div>
             </>
           )}
@@ -153,5 +167,4 @@ console.log('alertasLogin:', alertasLogin);
       </Box>
     </Box>
   );
-  
 }

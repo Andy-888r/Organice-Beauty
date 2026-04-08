@@ -3,10 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Drawer, Tooltip } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
-
+ 
 const DRAWER_OPEN   = 260;
 const DRAWER_CLOSED = 64;
-
+const BASE = 'http://localhost:8080/api';
+ 
 const IconInicio = ({ color }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z"/>
@@ -52,15 +53,6 @@ const IconInventario = ({ color }) => (
     <line x1="6" y1="19.5" x2="6" y2="19.5" strokeWidth="2"/>
   </svg>
 );
-const IconSolicitudes = ({ color }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8h1a4 4 0 010 8h-1"/>
-    <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
-    <line x1="6" y1="1" x2="6" y2="4"/>
-    <line x1="10" y1="1" x2="10" y2="4"/>
-    <line x1="14" y1="1" x2="14" y2="4"/>
-  </svg>
-);
 const IconReportes = ({ color }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -95,7 +87,7 @@ const IconPerfil = ({ color }) => (
     <path d="M16 3.5c1.5.8 2.5 2.3 2.5 4S17.5 10.7 16 11.5"/>
   </svg>
 );
-
+ 
 const ICON_MAP = {
   '/admin':             (c) => <IconInicio        color={c} />,
   '/admin/productos':   (c) => <IconProductos     color={c} />,
@@ -103,27 +95,17 @@ const ICON_MAP = {
   '/admin/clientes':    (c) => <IconClientes      color={c} />,
   '/admin/proveedores': (c) => <IconProveedores   color={c} />,
   '/admin/inventario':  (c) => <IconInventario    color={c} />,
-  '/admin/solicitudes': (c) => <IconSolicitudes   color={c} />,
   '/admin/reportes':    (c) => <IconReportes      color={c} />,
   '/cliente':           (c) => <IconInicioCliente color={c} />,
   '/cliente/compras':   (c) => <IconComprar       color={c} />,
   '/cliente/historial': (c) => <IconHistorial     color={c} />,
   '/cliente/perfil':    (c) => <IconPerfil        color={c} />,
 };
-
-// ══════════════════════════════════════
-// PALETA PISTACHE
-// Fondo: #C8E6A0 (pistache medio)
-// Fondo hover: #B8DA8A
-// Activo: #2C4A1E (verde oscuro)
-// Texto: #1A3210 (casi negro verde)
-// Texto suave: #3D5E2A
-// ══════════════════════════════════════
-
+ 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
   .eb-sidebar * { box-sizing: border-box; }
-
+ 
   .eb-sb-logo-box {
     width: 38px; height: 38px; border-radius: 3px; overflow: hidden;
     background: #fff;
@@ -131,7 +113,6 @@ const styles = `
     box-shadow: 0 2px 8px rgba(44,74,30,0.15);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-
   .eb-sb-brand {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.85rem; font-weight: 600;
@@ -139,143 +120,81 @@ const styles = `
     letter-spacing: 0.20em; text-transform: uppercase;
     line-height: 1; white-space: nowrap;
   }
-
   .eb-sb-divider {
-    height: 1px;
-    background: rgba(44,74,30,0.18);
-    margin: 0 14px;
+    height: 1px; background: rgba(44,74,30,0.18); margin: 0 14px;
   }
   .eb-sb-divider.light { background: rgba(44,74,30,0.10); }
-
-  /* ── Items del menú ── */
+ 
   .eb-sb-nav { padding: 6px 8px; flex: 1; }
-
   .eb-sb-item {
     display: flex; align-items: center; gap: 11px;
     padding: 10px 12px; border-radius: 6px; cursor: pointer;
     margin-bottom: 2px; transition: all 0.18s;
     border: none; background: transparent;
-    width: 100%; text-align: left; position: relative;
-    outline: none;
+    width: 100%; text-align: left; position: relative; outline: none;
   }
-  .eb-sb-item:hover {
-    background: rgba(44,74,30,0.10);
-  }
-  .eb-sb-item.active {
-    background: #2C4A1E;
-    box-shadow: 0 2px 10px rgba(44,74,30,0.30);
-  }
-
-  .eb-sb-item-icon {
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; width: 20px;
-    transition: transform 0.18s;
-  }
+  .eb-sb-item:hover { background: rgba(44,74,30,0.10); }
+  .eb-sb-item.active { background: #2C4A1E; box-shadow: 0 2px 10px rgba(44,74,30,0.30); }
+  .eb-sb-item-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 20px; transition: transform 0.18s; }
   .eb-sb-item:hover:not(.active) .eb-sb-item-icon { transform: scale(1.10); }
-
-  .eb-sb-item-label {
-    font-family: 'Jost', sans-serif;
-    font-size: 0.88rem; font-weight: 500;
-    color: #1A3210;
-    white-space: nowrap; transition: all 0.18s;
-    letter-spacing: 0.02em;
-  }
-  .eb-sb-item:hover:not(.active) .eb-sb-item-label {
-    color: #0D1F08;
-  }
-  .eb-sb-item.active .eb-sb-item-label {
-    color: #C1E899;
-    font-weight: 600;
-  }
-
-  /* Indicador lateral activo */
-  .eb-sb-item.active::after {
-    content: '';
-    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #C1E899;
-  }
-
-  /* ── Toggle ── */
+  .eb-sb-item-label { font-family: 'Jost', sans-serif; font-size: 0.88rem; font-weight: 500; color: #1A3210; white-space: nowrap; transition: all 0.18s; letter-spacing: 0.02em; }
+  .eb-sb-item:hover:not(.active) .eb-sb-item-label { color: #0D1F08; }
+  .eb-sb-item.active .eb-sb-item-label { color: #C1E899; font-weight: 600; }
+  .eb-sb-item.active::after { content: ''; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: #C1E899; }
+ 
   .eb-sb-toggle {
     width: 26px; height: 26px; border-radius: 4px;
-    background: rgba(44,74,30,0.12);
-    border: 1px solid rgba(44,74,30,0.20);
+    background: rgba(44,74,30,0.12); border: 1px solid rgba(44,74,30,0.20);
     cursor: pointer; color: #2C4A1E;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.2s; flex-shrink: 0;
   }
-  .eb-sb-toggle:hover {
-    background: #2C4A1E;
-    color: #C1E899;
-    border-color: #2C4A1E;
-  }
-
-  /* ── Cerrar sesión ── */
+  .eb-sb-toggle:hover { background: #2C4A1E; color: #C1E899; border-color: #2C4A1E; }
+ 
   .eb-sb-logout {
     display: flex; align-items: center; gap: 11px;
     padding: 10px 12px; border-radius: 6px; cursor: pointer;
     margin: 0 8px 10px; transition: all 0.18s;
-    border: 1px solid transparent;
-    background: transparent; width: calc(100% - 16px); text-align: left;
+    border: 1px solid transparent; background: transparent;
+    width: calc(100% - 16px); text-align: left;
   }
-  .eb-sb-logout:hover {
-    background: rgba(139,46,46,0.12);
-    border-color: rgba(139,46,46,0.20);
-  }
-  .eb-sb-logout-label {
-    font-family: 'Jost', sans-serif; font-size: 0.80rem; font-weight: 400;
-    color: rgba(44,74,30,0.55);
-    white-space: nowrap; letter-spacing: 0.04em;
-    transition: color 0.18s;
-  }
+  .eb-sb-logout:hover { background: rgba(139,46,46,0.12); border-color: rgba(139,46,46,0.20); }
+  .eb-sb-logout-label { font-family: 'Jost', sans-serif; font-size: 0.80rem; font-weight: 400; color: rgba(44,74,30,0.55); white-space: nowrap; letter-spacing: 0.04em; transition: color 0.18s; }
   .eb-sb-logout:hover .eb-sb-logout-label { color: #8B2E2E; }
+ 
+  /* Avatar foto */
+  .eb-sb-avatar-foto {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
 `;
-
+ 
 const esAdmin = (rol) => rol?.toLowerCase() === 'admin';
-
+ 
 export default function Sidebar({ items }) {
   const { user, logout } = useAuth();
   const navigate  = useNavigate();
   const location  = useLocation();
   const [open, setOpen] = useState(true);
-  const rol = user?.rol;
+  const rol     = user?.rol;
   const isAdmin = esAdmin(rol);
-
-  // Colores del identificador según rol
-  const ID = {
-    // Admin: verde oscuro sobre pistache claro
-    adminBg:       '#2C4A1E',
-    adminBorder:   'rgba(44,74,30,0.80)',
-    adminFranja:   'linear-gradient(90deg, #1A3210, #2C4A1E, #55883B, #C1E899)',
-    adminAvBg:     'rgba(193,232,153,0.20)',
-    adminAvBorder: 'rgba(193,232,153,0.50)',
-    adminAvColor:  '#C1E899',
-    adminNombre:   '#E6F5D0',
-    adminBadgeBg:  'rgba(193,232,153,0.15)',
-    adminBadgeClr: '#C1E899',
-    // Cliente: dorado/café sobre pistache claro
-    clienteBg:       '#2C4A1E',
-    clienteBorder:   'rgba(44,74,30,0.80)',
-    clienteFranja:   'linear-gradient(90deg, #1A3210, #2C4A1E, #55883B, #C1E899)',
-    clienteAvBg:     'rgba(193,232,153,0.20)',
-    clienteAvBorder: 'rgba(193,232,153,0.50)',
-    clienteAvColor:  '#C1E899',
-    clienteNombre:   '#E6F5D0',
-    clienteBadgeBg:  'rgba(193,232,153,0.15)',
-    clienteBadgeClr: '#C1E899',
-  };
-
-  const bg       = isAdmin ? ID.adminBg       : ID.clienteBg;
-  const border   = isAdmin ? ID.adminBorder   : ID.clienteBorder;
-  const franja   = isAdmin ? ID.adminFranja   : ID.clienteFranja;
-  const avBg     = isAdmin ? ID.adminAvBg     : ID.clienteAvBg;
-  const avBorder = isAdmin ? ID.adminAvBorder : ID.clienteAvBorder;
-  const avColor  = isAdmin ? ID.adminAvColor  : ID.clienteAvColor;
-  const nombre   = isAdmin ? ID.adminNombre   : ID.clienteNombre;
-  const badgeBg  = isAdmin ? ID.adminBadgeBg  : ID.clienteBadgeBg;
-  const badgeClr = isAdmin ? ID.adminBadgeClr : ID.clienteBadgeClr;
-
+ 
+  const bg       = '#2C4A1E';
+  const border   = 'rgba(44,74,30,0.80)';
+  const franja   = 'linear-gradient(90deg, #1A3210, #2C4A1E, #55883B, #C1E899)';
+  const avBg     = 'rgba(193,232,153,0.20)';
+  const avBorder = 'rgba(193,232,153,0.50)';
+  const avColor  = '#C1E899';
+  const nombreClr = '#E6F5D0';
+  const badgeBg  = 'rgba(193,232,153,0.15)';
+  const badgeClr = '#C1E899';
+ 
+  // Foto de perfil del contexto (se actualiza en tiempo real al subir)
+  const fotoSrc = user?.fotoPerfil ? `${BASE}${user.fotoPerfil}` : null;
+  const inicial = user?.nombre?.charAt(0).toUpperCase() || '?';
+ 
   return (
     <>
       <style>{styles}</style>
@@ -295,14 +214,12 @@ export default function Sidebar({ items }) {
           flexDirection: 'column',
         }
       }}>
-
-        {/* ── Header ── */}
+ 
+        {/* Header */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
+          display: 'flex', alignItems: 'center',
           justifyContent: open ? 'space-between' : 'center',
-          padding: open ? '16px 14px 14px' : '16px 0 14px',
-          gap: '10px',
+          padding: open ? '16px 14px 14px' : '16px 0 14px', gap: '10px',
         }}>
           {open ? (
             <>
@@ -320,83 +237,81 @@ export default function Sidebar({ items }) {
             </>
           ) : (
             <Tooltip title="Elite Beauty" placement="right" arrow>
-              <button className="eb-sb-toggle" onClick={() => setOpen(true)}
-                style={{ width:36, height:36 }}>
+              <button className="eb-sb-toggle" onClick={() => setOpen(true)} style={{ width:36, height:36 }}>
                 <ChevronRight style={{ fontSize:15 }} />
               </button>
             </Tooltip>
           )}
         </div>
-
+ 
         <div className="eb-sb-divider" />
-
-        {/* ══════════════════════════════════════
-            IDENTIFICADOR DE USUARIO
-        ══════════════════════════════════════ */}
+ 
+        {/* ══ IDENTIFICADOR DE USUARIO ══ */}
         {open ? (
           <div style={{
             margin: '10px 10px 6px',
-            borderRadius: '8px',
+            borderRadius: '10px',
             overflow: 'hidden',
             border: `1px solid ${border}`,
             boxShadow: '0 3px 14px rgba(0,0,0,0.18)',
           }}>
-            {/* Franja degradada superior */}
+            {/* Franja degradada */}
             <div style={{ height:'4px', background: franja }} />
-
-            {/* Cuerpo */}
+ 
+            {/* Cuerpo del identificador — más alto para que la foto sea visible */}
             <div style={{
               background: bg,
-              padding: '12px 14px',
-              display: 'flex', alignItems: 'center', gap: '12px',
+              padding: '16px 14px',
+              display: 'flex', alignItems: 'center', gap: '14px',
             }}>
-              {/* Avatar cuadrado con inicial */}
+              {/* Avatar circular — más grande, muestra foto o inicial */}
               <div style={{
-                width: '42px', height: '42px',
-                borderRadius: '6px', flexShrink: 0,
+                width: '56px', height: '56px',   // ← más grande que antes (era 42px)
+                borderRadius: '50%', flexShrink: 0,
                 background: avBg,
-                border: `1.5px solid ${avBorder}`,
+                border: `2px solid ${avBorder}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 position: 'relative',
+                overflow: 'hidden',
               }}>
-                <span style={{
-                  fontFamily: '"Cormorant Garamond", Georgia, serif',
-                  fontSize: '1.5rem', fontWeight: 600,
-                  color: avColor, lineHeight: 1,
-                }}>
-                  {user?.nombre?.charAt(0).toUpperCase()}
-                </span>
-                {/* Punto de estado */}
+                {fotoSrc
+                  ? <img className="eb-sb-avatar-foto" src={fotoSrc} alt="Perfil" />
+                  : <span style={{
+                      fontFamily: '"Cormorant Garamond", Georgia, serif',
+                      fontSize: '1.8rem', fontWeight: 600,
+                      color: avColor, lineHeight: 1,
+                    }}>
+                      {inicial}
+                    </span>
+                }
+                {/* Punto de estado online */}
                 <div style={{
-                  position: 'absolute', bottom: '-4px', right: '-4px',
-                  width: '10px', height: '10px', borderRadius: '50%',
+                  position: 'absolute', bottom: '2px', right: '2px',
+                  width: '11px', height: '11px', borderRadius: '50%',
                   background: avColor,
                   border: `2px solid ${bg}`,
+                  zIndex: 1,
                 }} />
               </div>
-
+ 
               {/* Nombre + badge */}
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{
                   fontFamily: 'Jost, sans-serif',
-                  fontSize: '0.86rem', fontWeight: 600,
-                  color: nombre,
+                  fontSize: '0.88rem', fontWeight: 600,
+                  color: nombreClr,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  lineHeight: 1.3, marginBottom: '6px',
+                  lineHeight: 1.3, marginBottom: '7px',
                 }}>
                   {user?.nombre}
                 </div>
-                {/* Badge de rol */}
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: '5px',
                   background: badgeBg,
                   border: `1px solid ${badgeClr}40`,
                   padding: '3px 9px', borderRadius: '20px',
                 }}>
-                  <div style={{
-                    width: '5px', height: '5px', borderRadius: '50%',
-                    background: badgeClr, flexShrink: 0,
-                  }} />
+                  <div style={{ width:'5px', height:'5px', borderRadius:'50%', background: badgeClr, flexShrink:0 }} />
                   <span style={{
                     fontFamily: 'Jost, sans-serif',
                     fontSize: '0.58rem', fontWeight: 700,
@@ -410,35 +325,38 @@ export default function Sidebar({ items }) {
             </div>
           </div>
         ) : (
-          /* Versión colapsada */
+          /* Versión colapsada — también muestra foto */
           <Tooltip title={`${user?.nombre} — ${user?.rol}`} placement="right" arrow>
             <div style={{ display:'flex', justifyContent:'center', padding:'10px 0', cursor:'default' }}>
               <div style={{
-                width: '36px', height: '36px', borderRadius: '6px',
+                width: '40px', height: '40px', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: bg,
-                border: `1.5px solid ${border}`,
+                border: `2px solid ${avBorder}`,
                 position: 'relative',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.20)',
+                overflow: 'hidden',
               }}>
-                <span style={{
-                  fontFamily: '"Cormorant Garamond", Georgia, serif',
-                  fontSize: '1.2rem', fontWeight: 600,
-                  color: avColor, lineHeight: 1,
-                }}>
-                  {user?.nombre?.charAt(0).toUpperCase()}
-                </span>
+                {fotoSrc
+                  ? <img className="eb-sb-avatar-foto" src={fotoSrc} alt="Perfil" />
+                  : <span style={{
+                      fontFamily: '"Cormorant Garamond", Georgia, serif',
+                      fontSize: '1.2rem', fontWeight: 600,
+                      color: avColor, lineHeight: 1,
+                    }}>
+                      {inicial}
+                    </span>
+                }
+                {/* Badge de rol en la esquina */}
                 <div style={{
-                  position: 'absolute', bottom: '-3px', right: '-3px',
-                  width: '10px', height: '10px', borderRadius: '3px',
+                  position: 'absolute', bottom: '-2px', right: '-2px',
+                  width: '14px', height: '14px', borderRadius: '4px',
                   background: avColor,
                   border: `1.5px solid #C8E6A0`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  zIndex: 1,
                 }}>
-                  <span style={{
-                    fontFamily: 'Jost, sans-serif', fontSize: '0.34rem',
-                    fontWeight: 700, color: bg,
-                  }}>
+                  <span style={{ fontFamily:'Jost,sans-serif', fontSize:'0.34rem', fontWeight:700, color: bg }}>
                     {user?.rol?.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -446,10 +364,10 @@ export default function Sidebar({ items }) {
             </div>
           </Tooltip>
         )}
-
+ 
         <div className="eb-sb-divider light" style={{ margin:'6px 14px 0' }} />
-
-        {/* ── Menú ── */}
+ 
+        {/* Menú */}
         <div className="eb-sb-nav" style={{ flex:1 }}>
           {items.map(({ label, path }) => {
             const isActive  = location.pathname === path;
@@ -474,17 +392,16 @@ export default function Sidebar({ items }) {
             );
           })}
         </div>
-
+ 
         <div className="eb-sb-divider light" />
-
-        {/* ── Cerrar sesión ── */}
+ 
+        {/* Cerrar sesión */}
         <Tooltip title={!open ? 'Cerrar sesion' : ''} placement="right" arrow>
           <button className="eb-sb-logout" onClick={logout}
             style={{ justifyContent: open ? 'flex-start' : 'center' }}>
             <span style={{ display:'flex', alignItems:'center', justifyContent:'center', width:20 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="rgba(44,74,30,0.55)" strokeWidth="1.5"
-                strokeLinecap="round" strokeLinejoin="round">
+                stroke="rgba(44,74,30,0.55)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" y1="12" x2="9" y2="12"/>
@@ -493,7 +410,7 @@ export default function Sidebar({ items }) {
             {open && <span className="eb-sb-logout-label">Cerrar sesion</span>}
           </button>
         </Tooltip>
-
+ 
       </Drawer>
     </>
   );

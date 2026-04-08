@@ -61,47 +61,51 @@ public class CompraService {
                                     double total) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-            Rectangle pageSize = new Rectangle(340, 700);
-            Document doc = new Document(pageSize, 28, 28, 28, 28);
+            float alturaBase  = 600f;
+            float alturaExtra = Math.max(0, items.size() - 3) * 16f;
+            Rectangle pageSize = new Rectangle(320, alturaBase + alturaExtra);
+
+            Document doc = new Document(pageSize, 20, 20, 20, 16);
             PdfWriter writer = PdfWriter.getInstance(doc, out);
             doc.open();
 
             // ══════════════════════════════════════
-            // PALETA ELITE BEAUTY — VERDE
+            // PALETA PISTACHE + VERDE
             // ══════════════════════════════════════
-            java.awt.Color VERDE_OSCURO  = new java.awt.Color(44,  74,  30);   // #2C4A1E
-            java.awt.Color VERDE_MEDIO   = new java.awt.Color(85,  136, 59);   // #55883B
-            java.awt.Color VERDE_CLARO   = new java.awt.Color(193, 232,153);   // #C1E899
-            java.awt.Color VERDE_FONDO   = new java.awt.Color(237, 245,228);   // #EDF5E4
-            java.awt.Color VERDE_MENTA   = new java.awt.Color(230, 240,220);   // #E6F0DC
-            java.awt.Color CAFE          = new java.awt.Color(154, 103, 53);   // #9A6735
-            java.awt.Color DORADO        = new java.awt.Color(201, 168, 76);   // #C9A84C
-            java.awt.Color BLANCO        = java.awt.Color.WHITE;
-            java.awt.Color TEXTO         = new java.awt.Color(44,  74,  30);   // texto principal
-            java.awt.Color TEXTO_CLARO   = new java.awt.Color(85,  136, 59);   // texto secundario
-            java.awt.Color BORDE         = new java.awt.Color(193, 218,170);   // borde suave
+            java.awt.Color V_OSCURO    = new java.awt.Color(26,  50,  16);
+            java.awt.Color V_MEDIO     = new java.awt.Color(44,  74,  30);
+            java.awt.Color V_BRILLANTE = new java.awt.Color(85,  136, 59);
+            java.awt.Color P_FUERTE    = new java.awt.Color(160, 210, 100);
+            java.awt.Color P_MEDIO     = new java.awt.Color(193, 232, 153);
+            java.awt.Color P_CLARO     = new java.awt.Color(220, 242, 190);
+            java.awt.Color P_PALE      = new java.awt.Color(240, 250, 222);
+            java.awt.Color P_FILA      = new java.awt.Color(228, 245, 205);
+            java.awt.Color BORDE       = new java.awt.Color(160, 205, 120);
+            java.awt.Color BLANCO      = java.awt.Color.WHITE;
+            java.awt.Color GRIS_V      = new java.awt.Color(100, 140, 70);
 
-            // ══════════════════════════════════════
-            // FUENTES
-            // ══════════════════════════════════════
-            Font fBrand      = new Font(Font.HELVETICA, 15, Font.BOLD,   BLANCO);
-            Font fBrandSub   = new Font(Font.HELVETICA,  6, Font.NORMAL, VERDE_CLARO);
-            Font fDocTitle   = new Font(Font.HELVETICA,  8, Font.BOLD,   VERDE_MEDIO);
-            Font fFolio      = new Font(Font.HELVETICA, 11, Font.BOLD,   TEXTO);
-            Font fLabelSmall = new Font(Font.HELVETICA,  6, Font.BOLD,   VERDE_MEDIO);
-            Font fValor      = new Font(Font.HELVETICA,  9, Font.BOLD,   TEXTO);
-            Font fValorSub   = new Font(Font.HELVETICA,  7, Font.NORMAL, TEXTO_CLARO);
-            Font fThHead     = new Font(Font.HELVETICA,  7, Font.BOLD,   BLANCO);
-            Font fTdNombre   = new Font(Font.HELVETICA,  8, Font.NORMAL, TEXTO);
-            Font fTdNum      = new Font(Font.HELVETICA,  8, Font.BOLD,   TEXTO);
-            Font fTdSub      = new Font(Font.HELVETICA,  8, Font.BOLD,   VERDE_MEDIO);
-            Font fTotalLabel = new Font(Font.HELVETICA,  8, Font.BOLD,   TEXTO_CLARO);
-            Font fTotalVal   = new Font(Font.HELVETICA,  8, Font.NORMAL, TEXTO);
-            Font fGrandTotal = new Font(Font.HELVETICA, 12, Font.BOLD,   BLANCO);
-            Font fFooter     = new Font(Font.HELVETICA,  7, Font.NORMAL, VERDE_MEDIO);
-            Font fFooterBold = new Font(Font.HELVETICA,  8, Font.BOLD,   VERDE_OSCURO);
-            Font fSlogan     = new Font(Font.HELVETICA,  6, Font.ITALIC, CAFE);
+            // ── FUENTES ──
+            Font fBrand      = new Font(Font.HELVETICA, 13, Font.BOLD,   BLANCO);
+            Font fBrandSub   = new Font(Font.HELVETICA,  5, Font.NORMAL, P_MEDIO);
+            Font fDocTitle   = new Font(Font.HELVETICA,  7, Font.BOLD,   V_BRILLANTE);
+            Font fFolio      = new Font(Font.HELVETICA, 13, Font.BOLD,   V_MEDIO);
+            Font fMetaLabel  = new Font(Font.HELVETICA,  5, Font.BOLD,   GRIS_V);
+            Font fMetaVal    = new Font(Font.HELVETICA,  8, Font.BOLD,   V_MEDIO);
+            Font fMetaSub    = new Font(Font.HELVETICA,  6, Font.NORMAL, V_BRILLANTE);
+            Font fThHead     = new Font(Font.HELVETICA,  6, Font.BOLD,   BLANCO);
+            Font fTdNombre   = new Font(Font.HELVETICA,  7, Font.NORMAL, V_MEDIO);
+            Font fTdNum      = new Font(Font.HELVETICA,  7, Font.BOLD,   V_MEDIO);
+            Font fTdSub      = new Font(Font.HELVETICA,  7, Font.BOLD,   V_BRILLANTE);
+            Font fTotalLbl   = new Font(Font.HELVETICA,  7, Font.BOLD,   GRIS_V);
+            Font fTotalVal   = new Font(Font.HELVETICA,  7, Font.NORMAL, V_MEDIO);
+            Font fGrandLbl   = new Font(Font.HELVETICA, 10, Font.BOLD,   BLANCO);
+            Font fGrandVal   = new Font(Font.HELVETICA, 10, Font.BOLD,   P_MEDIO);
+            Font fGracias    = new Font(Font.HELVETICA,  8, Font.BOLD,   V_MEDIO);
+            Font fGraciasSub = new Font(Font.HELVETICA,  6, Font.ITALIC, GRIS_V);
+            Font fRedes      = new Font(Font.HELVETICA,  6, Font.BOLD,   V_BRILLANTE);
+            Font fRedesSub   = new Font(Font.HELVETICA,  6, Font.ITALIC, GRIS_V);
 
+            // ── Fecha y folio ──
             java.util.Locale localeMX = new java.util.Locale.Builder()
                 .setLanguage("es").setRegion("MX").build();
             String fecha = LocalDateTime.now().format(
@@ -110,276 +114,299 @@ public class CompraService {
                 java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
             String folio = "EB-" + (System.currentTimeMillis() % 100000);
 
-            PdfContentByte canvas = writer.getDirectContent();
+            PdfContentByte cv = writer.getDirectContent();
             float W = pageSize.getWidth();
             float H = pageSize.getHeight();
 
-            // ── Fondo verde menta ──
-            canvas.setColorFill(VERDE_FONDO);
-            canvas.rectangle(0, 0, W, H);
-            canvas.fill();
+            // ── Fondo general ──
+            cv.setColorFill(P_PALE);
+            cv.rectangle(0, 0, W, H); cv.fill();
 
-            // ── Borde exterior dorado ──
-            canvas.setColorStroke(DORADO);
-            canvas.setLineWidth(1.2f);
-            canvas.rectangle(8, 8, W - 16, H - 16);
-            canvas.stroke();
-            // Borde interior verde claro
-            canvas.setColorStroke(VERDE_CLARO);
-            canvas.setLineWidth(0.4f);
-            canvas.rectangle(12, 12, W - 24, H - 24);
-            canvas.stroke();
+            // ── Borde exterior verde oscuro ──
+            cv.setColorStroke(V_MEDIO);
+            cv.setLineWidth(1.8f);
+            cv.rectangle(5, 5, W - 10, H - 10); cv.stroke();
 
-            // ── Header verde oscuro ──
-            float headerH = 92f;
-            canvas.setColorFill(VERDE_OSCURO);
-            canvas.rectangle(0, H - headerH, W, headerH);
-            canvas.fill();
-            // Franja inferior del header dorada
-            canvas.setColorFill(DORADO);
-            canvas.rectangle(0, H - headerH - 3f, W, 3f);
-            canvas.fill();
+            // ── Borde interior pistache ──
+            cv.setColorStroke(P_FUERTE);
+            cv.setLineWidth(0.4f);
+            cv.rectangle(8, 8, W - 16, H - 16); cv.stroke();
 
-            // ── Logo + nombre centrado en header ──
+            // ══════════════════════════════════════
+            // HEADER
+            // ══════════════════════════════════════
             PdfPTable tHeader = new PdfPTable(1);
             tHeader.setWidthPercentage(100);
             tHeader.setSpacingAfter(0f);
-            PdfPCell cHeader = new PdfPCell();
-            cHeader.setBackgroundColor(VERDE_OSCURO);
-            cHeader.setBorder(Rectangle.NO_BORDER);
-            cHeader.setPaddingTop(12f); cHeader.setPaddingBottom(12f);
-            cHeader.setPaddingLeft(16f); cHeader.setPaddingRight(16f);
 
+            PdfPCell cHeader = new PdfPCell();
+            cHeader.setBackgroundColor(V_OSCURO);
+            cHeader.setBorder(Rectangle.NO_BORDER);
+            cHeader.setPaddingTop(14f);
+            cHeader.setPaddingBottom(14f);
+            cHeader.setPaddingLeft(16f);
+            cHeader.setPaddingRight(16f);
+
+            boolean logoOk = false;
             try {
-                InputStream imgStream = getClass().getResourceAsStream("/static/logo_elite_beauty.png");
-                if (imgStream == null) imgStream = getClass().getResourceAsStream("/logo_elite_beauty.png");
-                if (imgStream != null) {
-                    Image logo = Image.getInstance(imgStream.readAllBytes());
-                    logo.scaleToFit(44, 44);
-                    logo.setAlignment(Element.ALIGN_CENTER);
-                    PdfPTable tLogo = new PdfPTable(1);
+                InputStream imgS = getClass().getResourceAsStream("/static/logo_elite_beauty.png");
+                if (imgS == null) imgS = getClass().getResourceAsStream("/logo_elite_beauty.png");
+                if (imgS != null) {
+                    Image logo = Image.getInstance(imgS.readAllBytes());
+                    logo.scaleToFit(30, 30);
+                    PdfPTable tL = new PdfPTable(2);
+                    tL.setWidths(new float[]{1, 4});
                     PdfPCell cLogo = new PdfPCell(logo);
                     cLogo.setBorder(Rectangle.NO_BORDER);
-                    cLogo.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    cLogo.setPaddingBottom(6f);
-                    tLogo.addCell(cLogo);
-                    PdfPCell cBrand = new PdfPCell();
-                    cBrand.setBorder(Rectangle.NO_BORDER);
-                    Paragraph pB = new Paragraph("ELITE BEAUTY", fBrand);
-                    pB.setAlignment(Element.ALIGN_CENTER);
-                    cBrand.addElement(pB);
-                    Paragraph pBS = new Paragraph("TIENDA DE BELLEZA", fBrandSub);
-                    pBS.setAlignment(Element.ALIGN_CENTER);
-                    cBrand.addElement(pBS);
-                    tLogo.addCell(cBrand);
-                    cHeader.addElement(tLogo);
+                    cLogo.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    tL.addCell(cLogo);
+                    PdfPCell cNm = new PdfPCell();
+                    cNm.setBorder(Rectangle.NO_BORDER);
+                    cNm.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    cNm.setPaddingLeft(6f);
+                    Paragraph pN = new Paragraph("ELITE BEAUTY", fBrand);
+                    pN.setAlignment(Element.ALIGN_LEFT);
+                    pN.setSpacingAfter(2f);
+                    Paragraph pS = new Paragraph("TIENDA DE BELLEZA  \u00b7  TORREON, COAH.", fBrandSub);
+                    cNm.addElement(pN); cNm.addElement(pS);
+                    tL.addCell(cNm);
+                    cHeader.addElement(tL);
+                    logoOk = true;
                 }
-            } catch (Exception ignored) {
-                Paragraph pB = new Paragraph("ELITE BEAUTY", fBrand);
-                pB.setAlignment(Element.ALIGN_CENTER);
-                cHeader.addElement(pB);
-                Paragraph pBS = new Paragraph("TIENDA DE BELLEZA", fBrandSub);
-                pBS.setAlignment(Element.ALIGN_CENTER);
-                cHeader.addElement(pBS);
+            } catch (Exception ignored) {}
+
+            if (!logoOk) {
+                Paragraph pN = new Paragraph("ELITE BEAUTY", fBrand);
+                pN.setAlignment(Element.ALIGN_CENTER); pN.setSpacingAfter(2f);
+                Paragraph pS = new Paragraph("TIENDA DE BELLEZA  \u00b7  TORREON, COAH.", fBrandSub);
+                pS.setAlignment(Element.ALIGN_CENTER);
+                cHeader.addElement(pN); cHeader.addElement(pS);
             }
+
             tHeader.addCell(cHeader);
+
+            // Franja pistache bajo header
+            PdfPTable tFranja = new PdfPTable(1);
+            tFranja.setWidthPercentage(100);
+            tFranja.setSpacingAfter(0f);
+            PdfPCell cFranja = new PdfPCell(new Phrase(" "));
+            cFranja.setBackgroundColor(P_FUERTE);
+            cFranja.setFixedHeight(3f);
+            cFranja.setBorder(Rectangle.NO_BORDER);
+            tFranja.addCell(cFranja);
+
             doc.add(tHeader);
+            doc.add(tFranja);
 
-            doc.add(new Paragraph(" ", new Font(Font.HELVETICA, 5)));
+            // ══════════════════════════════════════
+            // COMPROBANTE + FOLIO — centrado y visible
+            // ══════════════════════════════════════
+            doc.add(new Paragraph(" ", new Font(Font.HELVETICA, 4)));
 
-            // ── Titulo + folio ──
+            // "COMPROBANTE DE COMPRA" en tabla para mejor control
             PdfPTable tTitulo = new PdfPTable(1);
             tTitulo.setWidthPercentage(100);
-            tTitulo.setSpacingAfter(12f);
+            tTitulo.setSpacingAfter(0f);
+
             PdfPCell cTitulo = new PdfPCell();
             cTitulo.setBorder(Rectangle.NO_BORDER);
-            cTitulo.setPaddingTop(6f); cTitulo.setPaddingBottom(4f);
-            Paragraph pDocTitle = new Paragraph("TICKET DE COMPRA", fDocTitle);
+            cTitulo.setBackgroundColor(P_PALE);
+            cTitulo.setPaddingTop(6f);
+            cTitulo.setPaddingBottom(2f);
+            cTitulo.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            Paragraph pDocTitle = new Paragraph("COMPROBANTE DE COMPRA", fDocTitle);
             pDocTitle.setAlignment(Element.ALIGN_CENTER);
             pDocTitle.setSpacingAfter(4f);
             cTitulo.addElement(pDocTitle);
-            Paragraph pFolio = new Paragraph("#" + folio, fFolio);
+
+            Paragraph pFolio = new Paragraph("# " + folio, fFolio);
             pFolio.setAlignment(Element.ALIGN_CENTER);
+            pFolio.setSpacingAfter(4f);
             cTitulo.addElement(pFolio);
+
             tTitulo.addCell(cTitulo);
             doc.add(tTitulo);
 
-            // ── Linea decorativa verde-dorada ──
-            doc.add(lineaDecorativa(VERDE_MEDIO, DORADO, VERDE_FONDO));
+            doc.add(separador(P_FUERTE, V_BRILLANTE, P_PALE));
 
-            // ── Bloque cliente + fecha ──
-            PdfPTable tInfo = new PdfPTable(2);
-            tInfo.setWidthPercentage(100);
-            tInfo.setWidths(new float[]{50, 50});
-            tInfo.setSpacingBefore(8f);
-            tInfo.setSpacingAfter(12f);
+            // ══════════════════════════════════════
+            // META: cliente | fecha + hora
+            // ══════════════════════════════════════
+            PdfPTable tMeta = new PdfPTable(2);
+            tMeta.setWidthPercentage(100);
+            tMeta.setWidths(new float[]{50, 50});
+            tMeta.setSpacingBefore(2f);
+            tMeta.setSpacingAfter(4f);
 
-            tInfo.addCell(infoCelda("CLIENTE",
+            tMeta.addCell(metaCelda("CLIENTE",
                 nombreCliente != null ? nombreCliente : "Cliente",
                 "Compra registrada",
-                fLabelSmall, fValor, fValorSub,
-                VERDE_MENTA, BORDE, VERDE_MEDIO, true));
+                fMetaLabel, fMetaVal, fMetaSub, P_FILA, BORDE, true, false));
 
-            tInfo.addCell(infoCelda("FECHA",
-                fecha, "Hora: " + hora,
-                fLabelSmall, fValor, fValorSub,
-                VERDE_MENTA, BORDE, VERDE_MEDIO, false));
+            tMeta.addCell(metaCelda("FECHA",
+                fecha,
+                "Hora: " + hora,
+                fMetaLabel, fMetaVal, fMetaSub, P_CLARO, BORDE, false, true));
 
-            doc.add(tInfo);
+            doc.add(tMeta);
 
-            // ── Tabla productos ──
-            PdfPTable tProductos = new PdfPTable(4);
-            tProductos.setWidthPercentage(100);
-            tProductos.setWidths(new float[]{42, 12, 22, 24});
-            tProductos.setSpacingAfter(0f);
+            doc.add(separador(P_FUERTE, V_BRILLANTE, P_PALE));
 
-            String[] heads  = { "PRODUCTO", "UDS", "PRECIO", "TOTAL" };
-            int[]    aligns = { Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_RIGHT, Element.ALIGN_RIGHT };
+            // ══════════════════════════════════════
+            // TABLA PRODUCTOS
+            // ══════════════════════════════════════
+            PdfPTable tProd = new PdfPTable(4);
+            tProd.setWidthPercentage(100);
+            tProd.setWidths(new float[]{44, 11, 22, 23});
+            tProd.setSpacingBefore(3f);
+            tProd.setSpacingAfter(0f);
+
+            String[] heads  = {"PRODUCTO", "UDS", "PRECIO", "TOTAL"};
+            int[]    aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER,
+                               Element.ALIGN_RIGHT, Element.ALIGN_RIGHT};
+
             for (int i = 0; i < heads.length; i++) {
                 PdfPCell ch = new PdfPCell(new Phrase(heads[i], fThHead));
-                ch.setBackgroundColor(VERDE_OSCURO);
-                ch.setPaddingTop(8f); ch.setPaddingBottom(8f);
-                ch.setPaddingLeft(i == 0 ? 8f : 4f);
-                ch.setPaddingRight(i == heads.length - 1 ? 8f : 4f);
+                ch.setBackgroundColor(V_MEDIO);
+                ch.setPaddingTop(7f); ch.setPaddingBottom(7f);
+                ch.setPaddingLeft(i == 0 ? 8f : 3f);
+                ch.setPaddingRight(i == heads.length - 1 ? 8f : 3f);
                 ch.setBorder(Rectangle.NO_BORDER);
                 ch.setHorizontalAlignment(aligns[i]);
-                tProductos.addCell(ch);
+                tProd.addCell(ch);
             }
 
             for (int i = 0; i < items.size(); i++) {
                 CompraRequest.ItemCompra item = items.get(i);
                 String nombre   = i < nombresProductos.size() ? nombresProductos.get(i) : "Producto";
                 double subtotal = item.getPrecio() * item.getCantidad();
-                java.awt.Color bgFila = (i % 2 == 0) ? BLANCO : VERDE_MENTA;
+                java.awt.Color bgF = (i % 2 == 0) ? BLANCO : P_FILA;
 
-                PdfPCell cNom = new PdfPCell(new Phrase(nombre, fTdNombre));
-                cNom.setBackgroundColor(bgFila); cNom.setPaddingTop(7f); cNom.setPaddingBottom(7f);
-                cNom.setPaddingLeft(8f); cNom.setBorderColor(BORDE);
-                cNom.setBorderWidthTop(0f); cNom.setBorderWidthBottom(0.5f);
-                cNom.setBorderWidthLeft(0f); cNom.setBorderWidthRight(0f);
-                tProductos.addCell(cNom);
-
-                PdfPCell cCant = new PdfPCell(new Phrase(String.valueOf(item.getCantidad()), fTdNum));
-                cCant.setBackgroundColor(bgFila); cCant.setPaddingTop(7f); cCant.setPaddingBottom(7f);
-                cCant.setBorderColor(BORDE); cCant.setBorderWidthTop(0f); cCant.setBorderWidthBottom(0.5f);
-                cCant.setBorderWidthLeft(0f); cCant.setBorderWidthRight(0f);
-                cCant.setHorizontalAlignment(Element.ALIGN_CENTER);
-                tProductos.addCell(cCant);
-
-                PdfPCell cPrecio = new PdfPCell(new Phrase("$" + fmt(item.getPrecio()), fTdNum));
-                cPrecio.setBackgroundColor(bgFila); cPrecio.setPaddingTop(7f); cPrecio.setPaddingBottom(7f);
-                cPrecio.setPaddingRight(4f); cPrecio.setBorderColor(BORDE);
-                cPrecio.setBorderWidthTop(0f); cPrecio.setBorderWidthBottom(0.5f);
-                cPrecio.setBorderWidthLeft(0f); cPrecio.setBorderWidthRight(0f);
-                cPrecio.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                tProductos.addCell(cPrecio);
-
-                PdfPCell cSub = new PdfPCell(new Phrase("$" + fmt(subtotal), fTdSub));
-                cSub.setBackgroundColor(bgFila); cSub.setPaddingTop(7f); cSub.setPaddingBottom(7f);
-                cSub.setPaddingRight(8f); cSub.setBorderColor(BORDE);
-                cSub.setBorderWidthTop(0f); cSub.setBorderWidthBottom(0.5f);
-                cSub.setBorderWidthLeft(0f); cSub.setBorderWidthRight(0f);
-                cSub.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                tProductos.addCell(cSub);
+                tProd.addCell(filaCelda(nombre,
+                    fTdNombre, bgF, BORDE, Element.ALIGN_LEFT,   8f, 3f));
+                tProd.addCell(filaCelda(String.valueOf(item.getCantidad()),
+                    fTdNum,    bgF, BORDE, Element.ALIGN_CENTER,  3f, 3f));
+                tProd.addCell(filaCelda("$" + fmt(item.getPrecio()),
+                    fTdNum,    bgF, BORDE, Element.ALIGN_RIGHT,   3f, 3f));
+                tProd.addCell(filaCelda("$" + fmt(subtotal),
+                    fTdSub,    bgF, BORDE, Element.ALIGN_RIGHT,   3f, 8f));
             }
-            doc.add(tProductos);
+            doc.add(tProd);
+            doc.add(lineaFina(P_FUERTE));
 
-            doc.add(lineaFina(VERDE_MEDIO));
-
-            // ── Totales ──
+            // ══════════════════════════════════════
+            // TOTALES
+            // ══════════════════════════════════════
             double iva      = total * 0.16;
             double totalFin = total + iva;
 
-            PdfPTable tTotales = new PdfPTable(2);
-            tTotales.setWidthPercentage(80);
-            tTotales.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            tTotales.setWidths(new float[]{55, 45});
-            tTotales.setSpacingBefore(6f);
-            tTotales.setSpacingAfter(16f);
+            PdfPTable tTot = new PdfPTable(2);
+            tTot.setWidthPercentage(70);
+            tTot.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            tTot.setWidths(new float[]{52, 48});
+            tTot.setSpacingBefore(2f);
+            tTot.setSpacingAfter(10f);
 
-            filaTotales(tTotales, "Subtotal", "$" + fmt(total), fTotalLabel, fTotalVal, BLANCO, BORDE);
-            filaTotales(tTotales, "IVA (16%)", "$" + fmt(iva), fTotalLabel, fTotalVal, VERDE_MENTA, BORDE);
+            filaTotal(tTot, "Subtotal",  "$" + fmt(total),
+                fTotalLbl, fTotalVal, BLANCO, BORDE);
+            filaTotal(tTot, "IVA (16%)", "$" + fmt(iva),
+                fTotalLbl, fTotalVal, P_FILA, BORDE);
 
-            PdfPCell cTL = new PdfPCell(new Phrase("TOTAL", fGrandTotal));
-            cTL.setBackgroundColor(VERDE_OSCURO); cTL.setPaddingTop(9f); cTL.setPaddingBottom(9f);
-            cTL.setPaddingLeft(10f); cTL.setBorder(Rectangle.NO_BORDER);
+            PdfPCell cTL = new PdfPCell(new Phrase("TOTAL", fGrandLbl));
+            cTL.setBackgroundColor(V_MEDIO); cTL.setBorder(Rectangle.NO_BORDER);
+            cTL.setPaddingTop(9f); cTL.setPaddingBottom(9f); cTL.setPaddingLeft(10f);
             cTL.setHorizontalAlignment(Element.ALIGN_LEFT);
-            tTotales.addCell(cTL);
-            PdfPCell cTV = new PdfPCell(new Phrase("$" + fmt(totalFin), fGrandTotal));
-            cTV.setBackgroundColor(VERDE_OSCURO); cTV.setPaddingTop(9f); cTV.setPaddingBottom(9f);
-            cTV.setPaddingRight(10f); cTV.setBorder(Rectangle.NO_BORDER);
+            tTot.addCell(cTL);
+
+            PdfPCell cTV = new PdfPCell(new Phrase("$" + fmt(totalFin), fGrandVal));
+            cTV.setBackgroundColor(V_MEDIO); cTV.setBorder(Rectangle.NO_BORDER);
+            cTV.setPaddingTop(9f); cTV.setPaddingBottom(9f); cTV.setPaddingRight(10f);
             cTV.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            tTotales.addCell(cTV);
-            doc.add(tTotales);
+            tTot.addCell(cTV);
+            doc.add(tTot);
 
-            doc.add(lineaDecorativa(VERDE_MEDIO, DORADO, VERDE_FONDO));
+            doc.add(separador(P_FUERTE, V_BRILLANTE, P_PALE));
 
-            // ── Pie ──
-            doc.add(new Paragraph(" ", new Font(Font.HELVETICA, 4)));
+            // ══════════════════════════════════════
+            // PIE
+            // ══════════════════════════════════════
+            PdfPTable tPie = new PdfPTable(2);
+            tPie.setWidthPercentage(100);
+            tPie.setWidths(new float[]{55, 45});
+            tPie.setSpacingBefore(5f);
+            tPie.setSpacingAfter(0f);
 
-            Paragraph pGracias = new Paragraph("Gracias por tu compra", fFooterBold);
-            pGracias.setAlignment(Element.ALIGN_CENTER); pGracias.setSpacingAfter(3f);
-            doc.add(pGracias);
+            PdfPCell cMsg = new PdfPCell();
+            cMsg.setBackgroundColor(P_CLARO);
+            cMsg.setBorderColor(BORDE); cMsg.setBorderWidth(0.5f);
+            cMsg.setPaddingTop(12f); cMsg.setPaddingBottom(12f);
+            cMsg.setPaddingLeft(14f); cMsg.setPaddingRight(8f);
+            Paragraph pG = new Paragraph("\u00a1Gracias por tu compra!", fGracias);
+            pG.setSpacingAfter(4f);
+            cMsg.addElement(pG);
+            cMsg.addElement(new Paragraph("Esperamos verte muy pronto :)", fGraciasSub));
+            tPie.addCell(cMsg);
 
-            Paragraph pSlogan = new Paragraph("— Tu belleza, nuestra prioridad —", fSlogan);
-            pSlogan.setAlignment(Element.ALIGN_CENTER); pSlogan.setSpacingAfter(6f);
-            doc.add(pSlogan);
+            PdfPCell cRedes = new PdfPCell();
+            cRedes.setBackgroundColor(V_MEDIO);
+            cRedes.setBorder(Rectangle.NO_BORDER);
+            cRedes.setPaddingTop(10f); cRedes.setPaddingBottom(10f);
+            cRedes.setPaddingLeft(10f); cRedes.setPaddingRight(8f);
 
-            Paragraph pPolitica = new Paragraph(
-                "Cambios y devoluciones dentro de 30 dias con este ticket.",
-                new Font(Font.HELVETICA, 6, Font.NORMAL, TEXTO_CLARO));
-            pPolitica.setAlignment(Element.ALIGN_CENTER); pPolitica.setSpacingAfter(6f);
-            doc.add(pPolitica);
-
-            // ── Redes sociales ──
-            PdfPTable tRedes = new PdfPTable(2);
-            tRedes.setWidthPercentage(70);
-            tRedes.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tRedes.setWidths(new float[]{50, 50});
-            tRedes.setSpacingBefore(4f);
-            tRedes.setSpacingAfter(8f);
-
-            PdfPCell cInsta = new PdfPCell();
-            cInsta.setBorder(Rectangle.NO_BORDER); cInsta.setHorizontalAlignment(Element.ALIGN_CENTER);
-            PdfPTable rowInsta = new PdfPTable(2);
-            try { rowInsta.setWidths(new float[]{1, 4}); } catch (Exception ignored) {}
-            PdfPCell cIconInsta = new PdfPCell(); cIconInsta.setBorder(Rectangle.NO_BORDER); cIconInsta.setPaddingRight(4f);
+            PdfPTable rowI = new PdfPTable(2);
+            rowI.setSpacingAfter(5f);
+            try { rowI.setWidths(new float[]{1, 5}); } catch (Exception ignored) {}
+            PdfPCell cII = new PdfPCell();
+            cII.setBorder(Rectangle.NO_BORDER); cII.setPaddingRight(3f);
             try {
-                InputStream insta = getClass().getResourceAsStream("/static/instagram_icon.png");
-                if (insta != null) { Image i = Image.getInstance(insta.readAllBytes()); i.scaleToFit(12,12); cIconInsta.addElement(i); }
+                InputStream is = getClass().getResourceAsStream("/static/instagram_icon.png");
+                if (is != null) {
+                    Image ig = Image.getInstance(is.readAllBytes());
+                    ig.scaleToFit(10, 10); cII.addElement(ig);
+                }
             } catch (Exception ignored) {}
-            rowInsta.addCell(cIconInsta);
-            PdfPCell cTextInsta = new PdfPCell(); cTextInsta.setBorder(Rectangle.NO_BORDER); cTextInsta.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cTextInsta.addElement(new Paragraph("@elite_beautytrc", new Font(Font.HELVETICA, 7, Font.BOLD, VERDE_MEDIO)));
-            rowInsta.addCell(cTextInsta);
-            cInsta.addElement(rowInsta);
-            tRedes.addCell(cInsta);
+            rowI.addCell(cII);
+            PdfPCell cTI = new PdfPCell(new Phrase("@elite_beautytrc", fRedes));
+            cTI.setBorder(Rectangle.NO_BORDER);
+            cTI.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            rowI.addCell(cTI);
+            cRedes.addElement(rowI);
 
-            PdfPCell cFace = new PdfPCell();
-            cFace.setBorder(Rectangle.NO_BORDER); cFace.setHorizontalAlignment(Element.ALIGN_CENTER);
-            PdfPTable rowFace = new PdfPTable(2);
-            try { rowFace.setWidths(new float[]{1, 4}); } catch (Exception ignored) {}
-            PdfPCell cIconFace = new PdfPCell(); cIconFace.setBorder(Rectangle.NO_BORDER); cIconFace.setPaddingRight(4f);
+            PdfPTable rowF = new PdfPTable(2);
+            try { rowF.setWidths(new float[]{1, 5}); } catch (Exception ignored) {}
+            PdfPCell cIF = new PdfPCell();
+            cIF.setBorder(Rectangle.NO_BORDER); cIF.setPaddingRight(3f);
             try {
-                InputStream face = getClass().getResourceAsStream("/static/facebook_icon.png");
-                if (face != null) { Image i = Image.getInstance(face.readAllBytes()); i.scaleToFit(12,12); cIconFace.addElement(i); }
+                InputStream fs = getClass().getResourceAsStream("/static/facebook_icon.png");
+                if (fs != null) {
+                    Image fb = Image.getInstance(fs.readAllBytes());
+                    fb.scaleToFit(10, 10); cIF.addElement(fb);
+                }
             } catch (Exception ignored) {}
-            rowFace.addCell(cIconFace);
-            PdfPCell cTextFace = new PdfPCell(); cTextFace.setBorder(Rectangle.NO_BORDER); cTextFace.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cTextFace.addElement(new Paragraph("Proximamente", new Font(Font.HELVETICA, 7, Font.ITALIC, CAFE)));
-            rowFace.addCell(cTextFace);
-            cFace.addElement(rowFace);
-            tRedes.addCell(cFace);
-            doc.add(tRedes);
+            rowF.addCell(cIF);
+            PdfPCell cTF = new PdfPCell(new Phrase("Pr\u00f3ximamente", fRedesSub));
+            cTF.setBorder(Rectangle.NO_BORDER);
+            cTF.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            rowF.addCell(cTF);
+            cRedes.addElement(rowF);
 
-            // ── Franja inferior verde oscuro ──
-            PdfPTable tFooterBar = new PdfPTable(1);
-            tFooterBar.setWidthPercentage(100); tFooterBar.setSpacingBefore(10f);
-            PdfPCell cFooterBar = new PdfPCell(new Phrase(" "));
-            cFooterBar.setBackgroundColor(VERDE_OSCURO); cFooterBar.setFixedHeight(6f);
-            cFooterBar.setBorder(Rectangle.NO_BORDER);
-            tFooterBar.addCell(cFooterBar);
-            doc.add(tFooterBar);
+            tPie.addCell(cRedes);
+            doc.add(tPie);
+
+            // ── Barra final ──
+            PdfPTable tBar = new PdfPTable(1);
+            tBar.setWidthPercentage(100);
+            tBar.setSpacingBefore(6f);
+            PdfPCell bP = new PdfPCell(new Phrase(" "));
+            bP.setBackgroundColor(P_FUERTE);
+            bP.setFixedHeight(4f); bP.setBorder(Rectangle.NO_BORDER);
+            tBar.addCell(bP);
+            PdfPCell bV = new PdfPCell(new Phrase(" "));
+            bV.setBackgroundColor(V_OSCURO);
+            bV.setFixedHeight(5f); bV.setBorder(Rectangle.NO_BORDER);
+            tBar.addCell(bV);
+            doc.add(tBar);
 
             doc.close();
             return out.toByteArray();
@@ -394,54 +421,82 @@ public class CompraService {
     // ══════════════════════════════════════
     private String fmt(double v) { return String.format("%.2f", v); }
 
-    private PdfPCell infoCelda(String label, String valor, String sub,
+    private PdfPCell metaCelda(String label, String valor, String sub,
                                 Font fLabel, Font fValor, Font fSub,
                                 java.awt.Color bg, java.awt.Color border,
-                                java.awt.Color lineColor,
-                                boolean isLeft) {
+                                boolean izq, boolean der) {
         PdfPCell c = new PdfPCell();
-        c.setBackgroundColor(bg); c.setBorderColor(border); c.setBorderWidth(0.8f);
-        c.setPaddingTop(10f); c.setPaddingBottom(10f);
-        c.setPaddingLeft(isLeft ? 10f : 8f); c.setPaddingRight(isLeft ? 8f : 10f);
-        Paragraph pL = new Paragraph(label, fLabel); pL.setSpacingAfter(4f); c.addElement(pL);
-        PdfPTable linea = new PdfPTable(1);
-        PdfPCell lc = new PdfPCell(new Phrase(" ")); lc.setFixedHeight(1.5f); lc.setBackgroundColor(lineColor); lc.setBorder(Rectangle.NO_BORDER);
-        linea.addCell(lc); c.addElement(linea);
-        c.addElement(new Paragraph(" ", new Font(Font.HELVETICA, 3)));
-        Paragraph pV = new Paragraph(valor, fValor); pV.setSpacingBefore(4f); pV.setSpacingAfter(2f); c.addElement(pV);
-        c.addElement(new Paragraph(sub, fSub));
+        c.setBackgroundColor(bg); c.setBorderColor(border); c.setBorderWidth(0.6f);
+        c.setPaddingTop(8f); c.setPaddingBottom(8f);
+        c.setPaddingLeft(izq ? 10f : 6f); c.setPaddingRight(der ? 10f : 6f);
+        Paragraph pL = new Paragraph(label, fLabel);
+        pL.setSpacingAfter(3f);
+        c.addElement(pL);
+        c.addElement(new Paragraph(valor, fValor));
+        if (sub != null && !sub.isEmpty())
+            c.addElement(new Paragraph(sub, fSub));
         return c;
     }
 
-    private PdfPTable lineaDecorativa(java.awt.Color color,
-                                       java.awt.Color dorado,
-                                       java.awt.Color bg) throws Exception {
+    private PdfPCell filaCelda(String texto, Font font,
+                                java.awt.Color bg, java.awt.Color border,
+                                int align, float padL, float padR) {
+        PdfPCell c = new PdfPCell(new Phrase(texto, font));
+        c.setBackgroundColor(bg);
+        c.setPaddingTop(6f); c.setPaddingBottom(6f);
+        c.setPaddingLeft(padL); c.setPaddingRight(padR);
+        c.setBorderColor(border);
+        c.setBorderWidthTop(0f); c.setBorderWidthBottom(0.4f);
+        c.setBorderWidthLeft(0f); c.setBorderWidthRight(0f);
+        c.setHorizontalAlignment(align);
+        return c;
+    }
+
+    private PdfPTable separador(java.awt.Color linea, java.awt.Color punto,
+                                 java.awt.Color bg) throws Exception {
         PdfPTable t = new PdfPTable(3);
-        t.setWidthPercentage(100); t.setWidths(new float[]{30, 40, 30});
-        t.setSpacingBefore(6f); t.setSpacingAfter(6f);
-        PdfPCell cL = new PdfPCell(new Phrase(" ")); cL.setFixedHeight(1f); cL.setBackgroundColor(color); cL.setBorder(Rectangle.NO_BORDER); t.addCell(cL);
-        PdfPCell cM = new PdfPCell(new Phrase("  \u2756  ", new Font(Font.HELVETICA, 8, Font.NORMAL, dorado)));
-        cM.setBorder(Rectangle.NO_BORDER); cM.setHorizontalAlignment(Element.ALIGN_CENTER); cM.setVerticalAlignment(Element.ALIGN_MIDDLE); cM.setBackgroundColor(bg); t.addCell(cM);
-        PdfPCell cR = new PdfPCell(new Phrase(" ")); cR.setFixedHeight(1f); cR.setBackgroundColor(color); cR.setBorder(Rectangle.NO_BORDER); t.addCell(cR);
+        t.setWidthPercentage(100);
+        t.setWidths(new float[]{38, 24, 38});
+        t.setSpacingBefore(3f); t.setSpacingAfter(3f);
+        PdfPCell cL = new PdfPCell(new Phrase(" "));
+        cL.setFixedHeight(1f); cL.setBackgroundColor(linea);
+        cL.setBorder(Rectangle.NO_BORDER); t.addCell(cL);
+        PdfPCell cM = new PdfPCell(new Phrase("  \u2767  ",
+            new Font(Font.HELVETICA, 7, Font.NORMAL, punto)));
+        cM.setBorder(Rectangle.NO_BORDER);
+        cM.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cM.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cM.setBackgroundColor(bg); t.addCell(cM);
+        PdfPCell cR = new PdfPCell(new Phrase(" "));
+        cR.setFixedHeight(1f); cR.setBackgroundColor(linea);
+        cR.setBorder(Rectangle.NO_BORDER); t.addCell(cR);
         return t;
     }
 
     private PdfPTable lineaFina(java.awt.Color color) throws Exception {
-        PdfPTable t = new PdfPTable(1); t.setWidthPercentage(100); t.setSpacingBefore(0f); t.setSpacingAfter(4f);
-        PdfPCell c = new PdfPCell(new Phrase(" ")); c.setFixedHeight(1.5f); c.setBackgroundColor(color); c.setBorder(Rectangle.NO_BORDER);
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(100);
+        t.setSpacingBefore(0f); t.setSpacingAfter(2f);
+        PdfPCell c = new PdfPCell(new Phrase(" "));
+        c.setFixedHeight(1.2f); c.setBackgroundColor(color);
+        c.setBorder(Rectangle.NO_BORDER);
         t.addCell(c); return t;
     }
 
-    private void filaTotales(PdfPTable tabla, String label, String valor,
-                              Font fLabel, Font fValor,
-                              java.awt.Color bg, java.awt.Color border) {
+    private void filaTotal(PdfPTable tabla, String label, String valor,
+                            Font fLabel, Font fValor,
+                            java.awt.Color bg, java.awt.Color border) {
         PdfPCell cL = new PdfPCell(new Phrase(label, fLabel));
-        cL.setBackgroundColor(bg); cL.setPaddingTop(5f); cL.setPaddingBottom(5f); cL.setPaddingLeft(10f);
-        cL.setBorderColor(border); cL.setBorderWidthBottom(0.5f); cL.setBorderWidthTop(0f); cL.setBorderWidthLeft(0f); cL.setBorderWidthRight(0f);
+        cL.setBackgroundColor(bg);
+        cL.setPaddingTop(4f); cL.setPaddingBottom(4f); cL.setPaddingLeft(10f);
+        cL.setBorderColor(border); cL.setBorderWidthBottom(0.4f);
+        cL.setBorderWidthTop(0f); cL.setBorderWidthLeft(0f); cL.setBorderWidthRight(0f);
         cL.setHorizontalAlignment(Element.ALIGN_LEFT); tabla.addCell(cL);
         PdfPCell cV = new PdfPCell(new Phrase(valor, fValor));
-        cV.setBackgroundColor(bg); cV.setPaddingTop(5f); cV.setPaddingBottom(5f); cV.setPaddingRight(10f);
-        cV.setBorderColor(border); cV.setBorderWidthBottom(0.5f); cV.setBorderWidthTop(0f); cV.setBorderWidthLeft(0f); cV.setBorderWidthRight(0f);
+        cV.setBackgroundColor(bg);
+        cV.setPaddingTop(4f); cV.setPaddingBottom(4f); cV.setPaddingRight(10f);
+        cV.setBorderColor(border); cV.setBorderWidthBottom(0.4f);
+        cV.setBorderWidthTop(0f); cV.setBorderWidthLeft(0f); cV.setBorderWidthRight(0f);
         cV.setHorizontalAlignment(Element.ALIGN_RIGHT); tabla.addCell(cV);
     }
 }
