@@ -7,6 +7,7 @@ import { productosAPI, clienteAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { MARBLE_STYLES } from '../../styles/marble';
+import StripeCheckout from '../../components/shared/StripeCheckout';
 
 const MENU = [
   { label:'Inicio',    icon:<ShoppingCart />, path:'/cliente' },
@@ -59,21 +60,15 @@ export default function ClienteCompras() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user } = useAuth();
   const { carrito, agregarAlCarrito, eliminarDelCarrito, limpiarCarrito, actualizarCantidad, total } = useCart();
-
+  const [mostrarPago, setMostrarPago] = useState(false);
   useEffect(() => { productosAPI.listarActivos().then(r => setProductos(r.data)); }, []);
 
   const handleAgregar = (p) => { agregarAlCarrito(p); toast.success(`${p.nombre} agregado al carrito`); };
 
-  const handleComprar = async () => {
-    if (carrito.length === 0) { toast.warning('El carrito esta vacio'); return; }
-    try {
-      const res = await clienteAPI.comprar({ idCliente: user.id, items: carrito.map(i => ({ idProducto:i.id, cantidad:i.cantidad, precio:i.precio })) });
-      const url  = window.URL.createObjectURL(new Blob([res.data], { type:'application/pdf' }));
-      const link = document.createElement('a'); link.href=url; link.download='ticket.pdf'; link.click();
-      limpiarCarrito(); setDrawerOpen(false);
-      toast.success('Compra realizada. Se descargo tu ticket.');
-    } catch { toast.error('Error al procesar la compra'); }
-  };
+ const handleComprar = async () => {
+  if (carrito.length === 0) { toast.warning('El carrito esta vacio'); return; }
+  setMostrarPago(true);
+}  ;
 
   return (
     <Box sx={{ display:'flex', bgcolor:'#EDF5E4', minHeight:'100vh' }} className="eb-page">
@@ -158,6 +153,19 @@ export default function ClienteCompras() {
                     <span className="eb-total-amount">${total.toFixed(2)}</span>
                   </div>
                   <button className="eb-buy-btn" onClick={handleComprar}>Comprar y descargar ticket</button>
+                  {mostrarPago && (
+  <StripeCheckout
+    monto={total * 100}
+    descripcion="Compra Elite Beauty"
+    onSuccess={() => {
+      limpiarCarrito();
+      setDrawerOpen(false);
+      setMostrarPago(false);
+      toast.success('Compra realizada. Se descargo tu ticket.');
+    }}
+    onError={() => toast.error('Error al procesar el pago')}
+  />
+)}
                 </div>
               </>
             )}
