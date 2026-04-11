@@ -36,7 +36,10 @@ function CheckoutForm({ monto, descripcion, onSuccess, onError }) {
     setMensaje('');
 
     try {
-      const res = await fetch('/api/payment/create-intent', {
+      
+         
+        const res = await fetch('http://localhost:8080/api/payment/create-intent', {
+          
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ monto }),
