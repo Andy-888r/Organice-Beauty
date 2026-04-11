@@ -32,48 +32,31 @@ const AlertaBajoStock = ({ alertas }) => {
         overflow: "hidden",
       }}>
  
-        {/* ── Header verde oscuro ── */}
+        {/* ── Header verde oscuro — sin botón X ── */}
         <div style={{
           background: "#2C4A1E",
           padding: "18px 22px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
           flexShrink: 0,
         }}>
-          <div>
-            <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              color: "#E6F5D0",
-              letterSpacing: "0.04em",
-              marginBottom: "2px",
-            }}>
-              Alerta de Inventario
-            </div>
-            <div style={{
-              fontSize: "0.62rem",
-              fontWeight: 500,
-              letterSpacing: "0.20em",
-              textTransform: "uppercase",
-              color: "#C1E899",
-            }}>
-              {alertas.length} producto(s) requieren atención
-            </div>
+          <div style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "1.25rem",
+            fontWeight: 600,
+            color: "#E6F5D0",
+            letterSpacing: "0.04em",
+            marginBottom: "2px",
+          }}>
+            Alerta de Inventario
           </div>
-          <button onClick={() => setVisible(false)} style={{
-            background: "rgba(193,232,153,0.12)",
-            border: "1px solid rgba(193,232,153,0.25)",
-            borderRadius: "4px",
-            width: "30px", height: "30px",
-            cursor: "pointer",
+          <div style={{
+            fontSize: "0.62rem",
+            fontWeight: 500,
+            letterSpacing: "0.20em",
+            textTransform: "uppercase",
             color: "#C1E899",
-            fontSize: "14px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-            transition: "background 0.2s",
-          }}>✕</button>
+          }}>
+            {alertas.length} producto(s) requieren atención
+          </div>
         </div>
  
         {/* ── Franja pistache ── */}
@@ -86,15 +69,10 @@ const AlertaBajoStock = ({ alertas }) => {
           {sinStock.length > 0 && (
             <div style={{ marginBottom: "16px" }}>
               <div style={{
-                fontSize: "0.58rem",
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#8B2E2E",
-                marginBottom: "8px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
+                fontSize: "0.58rem", fontWeight: 700,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                color: "#8B2E2E", marginBottom: "8px",
+                display: "flex", alignItems: "center", gap: "8px",
               }}>
                 <div style={{ flex: 1, height: "1px", background: "rgba(139,46,46,0.20)" }} />
                 ⚠ Sin stock ({sinStock.length})
@@ -106,24 +84,15 @@ const AlertaBajoStock = ({ alertas }) => {
                   const stock  = alerta.match(/Stock: (\d+)/)?.[1] ?? '0';
                   return (
                     <div key={i} style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      background: "rgba(139,46,46,0.07)",
-                      border: "1px solid rgba(139,46,46,0.18)",
-                      borderRadius: "3px",
-                      padding: "9px 14px",
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      background: "rgba(139,46,46,0.07)", border: "1px solid rgba(139,46,46,0.18)",
+                      borderRadius: "3px", padding: "9px 14px",
                     }}>
                       <span style={{ fontSize: "0.84rem", color: "#5C1A1A", fontWeight: 600 }}>{nombre}</span>
                       <span style={{
-                        fontSize: "0.58rem",
-                        fontWeight: 700,
-                        letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        color: "#fff",
-                        background: "#8B2E2E",
-                        padding: "3px 8px",
-                        borderRadius: "2px",
+                        fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.14em",
+                        textTransform: "uppercase", color: "#fff",
+                        background: "#8B2E2E", padding: "3px 8px", borderRadius: "2px",
                       }}>Stock: {stock}</span>
                     </div>
                   );
@@ -136,15 +105,10 @@ const AlertaBajoStock = ({ alertas }) => {
           {bajo.length > 0 && (
             <div>
               <div style={{
-                fontSize: "0.58rem",
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#9A6735",
-                marginBottom: "8px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
+                fontSize: "0.58rem", fontWeight: 700,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                color: "#9A6735", marginBottom: "8px",
+                display: "flex", alignItems: "center", gap: "8px",
               }}>
                 <div style={{ flex: 1, height: "1px", background: "rgba(154,103,53,0.20)" }} />
                 ↓ Stock bajo ({bajo.length})
@@ -156,24 +120,15 @@ const AlertaBajoStock = ({ alertas }) => {
                   const stock  = alerta.match(/Stock: (\d+)/)?.[1] ?? '0';
                   return (
                     <div key={i} style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      background: "rgba(154,103,53,0.07)",
-                      border: "1px solid rgba(154,103,53,0.20)",
-                      borderRadius: "3px",
-                      padding: "9px 14px",
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      background: "rgba(154,103,53,0.07)", border: "1px solid rgba(154,103,53,0.20)",
+                      borderRadius: "3px", padding: "9px 14px",
                     }}>
                       <span style={{ fontSize: "0.84rem", color: "#5C3A1E", fontWeight: 500 }}>{nombre}</span>
                       <span style={{
-                        fontSize: "0.58rem",
-                        fontWeight: 700,
-                        letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        color: "#fff",
-                        background: "#9A6735",
-                        padding: "3px 8px",
-                        borderRadius: "2px",
+                        fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.14em",
+                        textTransform: "uppercase", color: "#fff",
+                        background: "#9A6735", padding: "3px 8px", borderRadius: "2px",
                       }}>Stock: {stock}</span>
                     </div>
                   );
@@ -183,7 +138,7 @@ const AlertaBajoStock = ({ alertas }) => {
           )}
         </div>
  
-        {/* ── Footer ── */}
+        {/* ── Footer — solo botón Entendido ── */}
         <div style={{
           padding: "12px 22px",
           borderTop: "1px solid rgba(85,136,59,0.15)",
@@ -193,11 +148,7 @@ const AlertaBajoStock = ({ alertas }) => {
           justifyContent: "space-between",
           alignItems: "center",
         }}>
-          <span style={{
-            fontSize: "0.65rem",
-            color: "#55883B",
-            letterSpacing: "0.08em",
-          }}>
+          <span style={{ fontSize: "0.65rem", color: "#55883B", letterSpacing: "0.08em" }}>
             Revisa el módulo de Inventario para registrar entradas.
           </span>
           <button onClick={() => setVisible(false)} style={{
