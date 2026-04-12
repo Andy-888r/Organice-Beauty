@@ -52,6 +52,8 @@ export default function ClienteDashboard() {
   const [banners, setBanners]     = useState([]);
   const [productos, setProductos] = useState([]);
   const [slide, setSlide]         = useState(0);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [bannerSeleccionado, setBannerSeleccionado] = useState(null);
 
   useEffect(() => {
     bannersAPI.listarActivos().then(r => setBanners(r.data)).catch(() => {});
@@ -86,24 +88,35 @@ export default function ClienteDashboard() {
 
         <div className="eb-content">
           {banners.length > 0 ? (
-            <div className="eb-carousel">
-              <img src={`${BASE}${b.imagenPath}`} alt={b.titulo} />
+            <div className="eb-carousel" style={{ cursor:'pointer' }}
+  onClick={() => {
+    if (b.productos && b.productos.length === 1) {
+      setProductoSeleccionado(b.productos[0]);
+    } else if (b.productos && b.productos.length > 1) {
+      setBannerSeleccionado(b);
+    }
+  }}>
+  <img src={`${BASE}${b.imagenPath}`} alt={b.titulo} />
               <div className="eb-carousel-gradient" />
               <div className="eb-carousel-text">
                 {b.titulo     && <div className="eb-carousel-title">{b.titulo}</div>}
                 {b.descripcion && <div className="eb-carousel-desc">{b.descripcion}</div>}
               </div>
               {banners.length > 1 && (
-                <>
-                  <button className="eb-carousel-btn prev" onClick={anterior}><ChevronLeft /></button>
-                  <button className="eb-carousel-btn next" onClick={siguiente}><ChevronRight /></button>
-                  <div className="eb-carousel-dots">
-                    {banners.map((_, i) => (
-                      <div key={i} className={`eb-carousel-dot ${i===slide?'active':''}`} onClick={() => setSlide(i)} />
-                    ))}
-                  </div>
-                </>
-              )}
+  <>
+    <button className="eb-carousel-btn prev" onClick={e => { e.stopPropagation(); anterior(); }}>
+      <ChevronLeft />
+    </button>
+    <button className="eb-carousel-btn next" onClick={e => { e.stopPropagation(); siguiente(); }}>
+      <ChevronRight />
+    </button>
+    <div className="eb-carousel-dots">
+      {banners.map((_, i) => (
+        <div key={i} className={`eb-carousel-dot ${i===slide?'active':''}`} onClick={e => { e.stopPropagation(); setSlide(i); }} />
+      ))}
+    </div>
+  </>
+)}
             </div>
           ) : (
             <div className="eb-carousel-empty">
@@ -122,8 +135,7 @@ export default function ClienteDashboard() {
               </div>
               <div className="eb-products-grid">
                 {nuevos.map(p => (
-                  <div className="eb-product-card eb-card-wrap" key={p.id} onClick={() => navigate('/cliente/compras')}>
-                    {p.imagenPath
+                 <div className="eb-product-card eb-card-wrap" key={p.id} onClick={() => setProductoSeleccionado(p)}>                    {p.imagenPath
                       ? <img className="eb-product-img" src={`${BASE}${p.imagenPath}`} alt={p.nombre} />
                       : <div className="eb-product-placeholder">◈</div>
                     }
@@ -139,6 +151,111 @@ export default function ClienteDashboard() {
           )}
         </div>
       </Box>
+      {/* modales de los productos */}
+
+      {productoSeleccionado && (
+          <div style={{
+            position:'fixed', top:0, left:0, right:0, bottom:0,
+            backgroundColor:'rgba(0,0,0,0.5)', zIndex:9999,
+            display:'flex', alignItems:'center', justifyContent:'center',
+          }} onClick={() => setProductoSeleccionado(null)}>
+            <div style={{
+              backgroundColor:'#F8FAF6', borderRadius:'4px',
+              maxWidth:'480px', width:'90%',
+              boxShadow:'0 20px 60px rgba(44,74,30,0.25)',
+              border:'1px solid rgba(201,168,76,0.35)',
+              overflow:'hidden',
+            }} onClick={e => e.stopPropagation()}>
+              {productoSeleccionado.imagenPath
+                ? <img src={`${BASE}${productoSeleccionado.imagenPath}`} alt={productoSeleccionado.nombre}
+                    style={{ width:'100%', height:'260px', objectFit:'cover' }} />
+                : <div style={{ width:'100%', height:'260px', background:'rgba(85,136,59,0.10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'3rem', color:'#55883B' }}>◈</div>
+              }
+              <div style={{ padding:'24px 28px' }}>
+                <p style={{ fontFamily:'Jost,sans-serif', fontSize:'0.65rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'#55883B', margin:'0 0 6px' }}>
+                  {productoSeleccionado.marca} · {productoSeleccionado.categoria}
+                </p>
+                <h2 style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'1.6rem', fontWeight:600, color:'#2C4A1E', margin:'0 0 10px' }}>
+                  {productoSeleccionado.nombre}
+                </h2>
+                {productoSeleccionado.descripcion && (
+                  <p style={{ fontFamily:'Jost,sans-serif', fontSize:'0.82rem', color:'#55883B', lineHeight:1.6, margin:'0 0 16px' }}>
+                    {productoSeleccionado.descripcion}
+                  </p>
+                )}
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:'16px' }}>
+                  <span style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'2rem', fontWeight:600, color:'#9A6735' }}>
+                    ${productoSeleccionado.precio?.toFixed(2)}
+                  </span>
+                  <div style={{ display:'flex', gap:'10px' }}>
+                    <button style={{ background:'none', border:'1px solid rgba(85,136,59,0.40)', borderRadius:'2px', padding:'10px 18px', cursor:'pointer', fontFamily:'Jost,sans-serif', fontSize:'0.65rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#55883B' }}
+                      onClick={() => setProductoSeleccionado(null)}>
+                      Cerrar
+                    </button>
+                    <button style={{ background:'linear-gradient(135deg,#2C4A1E,#55883B)', color:'#F4F9F0', border:'none', borderRadius:'2px', padding:'10px 20px', cursor:'pointer', fontFamily:'Jost,sans-serif', fontSize:'0.65rem', letterSpacing:'0.16em', textTransform:'uppercase', display:'flex', alignItems:'center', gap:'6px' }}
+                      onClick={() => { setProductoSeleccionado(null); navigate('/cliente/compras'); }}>
+                      Ver en tienda
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+       {/* modales de los banners */}
+      {bannerSeleccionado && (
+        <div style={{
+          position:'fixed', top:0, left:0, right:0, bottom:0,
+          backgroundColor:'rgba(0,0,0,0.7)', zIndex:9999,
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }} onClick={() => setBannerSeleccionado(null)}>
+          <div style={{
+            backgroundColor:'#F8FAF6', borderRadius:'4px',
+            maxWidth:'680px', width:'90%',
+            boxShadow:'0 20px 60px rgba(44,74,30,0.25)',
+            border:'1px solid rgba(201,168,76,0.35)',
+            overflow:'hidden',
+          }} onClick={e => e.stopPropagation()}>
+            <img src={`${BASE}${bannerSeleccionado.imagenPath}`} alt={bannerSeleccionado.titulo}
+              style={{ width:'100%', height:'320px', objectFit:'cover', display:'block' }} />
+            <div style={{ padding:'24px 28px' }}>
+              {bannerSeleccionado.titulo && (
+                <h2 style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'1.8rem', fontWeight:600, color:'#2C4A1E', margin:'0 0 10px' }}>
+                  {bannerSeleccionado.titulo}
+                </h2>
+              )}
+              {bannerSeleccionado.descripcion && (
+                <p style={{ fontFamily:'Jost,sans-serif', fontSize:'0.85rem', color:'#55883B', lineHeight:1.7, margin:'0 0 16px' }}>
+                  {bannerSeleccionado.descripcion}
+                </p>
+              )}
+              {bannerSeleccionado.productos?.length > 0 && (
+                <div style={{ marginBottom:'16px' }}>
+                  <p style={{ fontFamily:'Jost,sans-serif', fontSize:'0.65rem', letterSpacing:'0.18em', textTransform:'uppercase', color:'#9A6735', marginBottom:'10px' }}>
+                    Productos en promoción
+                  </p>
+                  <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
+                    {bannerSeleccionado.productos.map(p => (
+                      <div key={p.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 12px', background:'rgba(85,136,59,0.06)', borderRadius:'2px', cursor:'pointer' }}
+                        onClick={() => { setBannerSeleccionado(null); setProductoSeleccionado(p); }}>
+                        <span style={{ fontFamily:'Jost,sans-serif', fontSize:'0.85rem', color:'#2C4A1E' }}>{p.nombre}</span>
+                        <span style={{ fontFamily:'Cormorant Garamond,serif', fontSize:'1.1rem', color:'#9A6735' }}>${p.precio?.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div style={{ display:'flex', justifyContent:'flex-end' }}>
+                <button style={{ background:'none', border:'1px solid rgba(85,136,59,0.40)', borderRadius:'2px', padding:'10px 18px', cursor:'pointer', fontFamily:'Jost,sans-serif', fontSize:'0.65rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#55883B' }}
+                  onClick={() => setBannerSeleccionado(null)}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </Box>
   );
-}
+} 
